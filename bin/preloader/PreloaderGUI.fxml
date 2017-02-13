@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="299.0" prefWidth="398.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preloader.PreloadController">
+   <children>
+      <Button id="Buttons" layoutX="25.0" layoutY="27.0" mnemonicParsing="false" onAction="#markWrittenTestsPressed" prefHeight="53.0" prefWidth="174.0" text="Mark Written Tests" />
+      <Button id="Buttons" layoutX="220.0" layoutY="27.0" mnemonicParsing="false" onAction="#markJavaTestsPressed" prefHeight="53.0" prefWidth="161.0" text="Mark Java Tests" />
+      <Button id="Buttons" layoutX="28.0" layoutY="113.0" mnemonicParsing="false" onAction="#markExamScripsPressed" prefHeight="53.0" prefWidth="168.0" text="Mark Exam Scripts" />
+      <Button id="Buttons" layoutX="220.0" layoutY="113.0" mnemonicParsing="false" onAction="#readFromExcelPressed" prefHeight="53.0" prefWidth="161.0" text="Read From Excel" />
+      <Button id="Buttons" layoutX="220.0" layoutY="199.0" mnemonicParsing="false" onAction="#basicSettingsPressed" prefHeight="53.0" prefWidth="161.0" text="Basic Settings" />
+      <Button id="Buttons" layoutX="28.0" layoutY="199.0" mnemonicParsing="false" onAction="#combineFilePressed" prefHeight="53.0" prefWidth="168.0" text="Combine Excel fles" />
+   </children>
+</AnchorPane>

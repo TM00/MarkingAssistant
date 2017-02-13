@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="392.0" prefWidth="280.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.written.gui.ConfigureController">
+	<children>
+		<Label layoutX="119.0" layoutY="14.0" prefHeight="36.0" prefWidth="60.0" text="Excel " textAlignment="CENTER">
+			<font>
+				<Font name="Arial" size="20.0" />
+			</font>
+		</Label>
+		<TextField fx:id="initials" layoutX="197.0" layoutY="65.0" prefHeight="17.0" prefWidth="25.0" />
+		<TextField fx:id="surname" layoutX="197.0" layoutY="102.0" prefHeight="17.0" prefWidth="25.0" />
+		<TextField fx:id="stNum" layoutX="197.0" layoutY="138.0" prefHeight="17.0" prefWidth="25.0" />
+		<TextField fx:id="mark" layoutX="197.0" layoutY="175.0" prefHeight="17.0" prefWidth="25.0" />
+		<TextField fx:id="rowIndex" layoutX="197.0" layoutY="210.0" prefHeight="17.0" prefWidth="25.0" />
+
+
+
+
+		<Label layoutX="39.0" layoutY="214.0" text="Start row" />
+		<Label layoutX="53.0" layoutY="180.0" text="Mark Column" />
+		<Label layoutX="39.0" layoutY="142.0" text="St. number Column" />
+		<Label layoutX="39.0" layoutY="106.0" text="Surname Column" />
+		<Label layoutX="39.0" layoutY="69.0" text="Intials Column" />
+
+		<Button layoutX="70.0" layoutY="295.0" mnemonicParsing="false" onAction="#saveClicked" prefHeight="65.0" prefWidth="158.0" text="Save &amp; Return" />
+
+	</children>
+</AnchorPane>

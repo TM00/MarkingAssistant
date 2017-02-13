@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="590.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.TabbedController">
+   <children>
+      <TabPane fx:id="tabPane" layoutY="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="604.0" prefWidth="375.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Excel">
+            <content>
+              <AnchorPane fx:id="ExcelAnchor" minHeight="0.0" minWidth="0.0" prefHeight="574.0" prefWidth="385.0" />
+            </content>
+          </Tab>
+          <Tab text="Java">
+            <content>
+              <AnchorPane fx:id="javaAnchor" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+            <Tab text="NameReader">
+               <content>
+                  <AnchorPane fx:id="NameReaderAnchor" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+            <Tab text="Exam">
+              <content>
+                <AnchorPane fx:id="ExamAnchor" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </Tab>
+            <Tab text="Settings">
+               <content>
+                  <AnchorPane fx:id="SettingsAnchor" minHeight="0.0" minWidth="0.0" prefHeight="575.0" prefWidth="246.0" />
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <HBox fx:id="mediaBar" layoutX="257.0" layoutY="4.0" prefHeight="21.0" prefWidth="114.0" />
+   </children>
+</AnchorPane>

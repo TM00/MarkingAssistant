@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="JARS/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="JARS/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="JARS/curvesapi-1.03.jar"/>
+	<classpathentry kind="lib" path="JARS/jfxrt.jar"/>
+	<classpathentry kind="lib" path="JARS/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="JARS/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-examples-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-excelant-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-ooxml-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-ooxml-schemas-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/poi-scratchpad-3.14-20160307.jar"/>
+	<classpathentry kind="lib" path="JARS/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="JARS/controlsfx-8.40.12.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://controlsfx.bitbucket.io/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="JARS/image4j.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

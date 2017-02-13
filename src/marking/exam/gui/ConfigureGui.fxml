@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="574.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.exam.gui.ConfigureController">
+   <children>
+      <Label layoutX="102.0" layoutY="22.0" prefHeight="36.0" prefWidth="222.0" text="Students Excel data" textAlignment="CENTER">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Label>
+      <TextField fx:id="rowIndex" layoutX="241.0" layoutY="137.0" prefHeight="17.0" prefWidth="25.0" />
+      <TextField fx:id="stNum" layoutX="241.0" layoutY="112.0" prefHeight="17.0" prefWidth="25.0" />
+      <TextField fx:id="surname" layoutX="241.0" layoutY="89.0" prefHeight="17.0" prefWidth="25.0" />
+      <TextField fx:id="initials" layoutX="241.0" layoutY="65.0" prefHeight="17.0" prefWidth="25.0" />
+      <Label layoutX="83.0" layoutY="141.0" text="Start row" />
+      <Label layoutX="83.0" layoutY="116.0" text="St. number Column" />
+      <Label layoutX="83.0" layoutY="93.0" text="Surname Column" />
+      <Label layoutX="83.0" layoutY="69.0" text="Intials Column" />
+      <Line endX="100.0" layoutX="180.0" layoutY="178.0" startX="-100.0" />
+      <Label layoutX="135.0" layoutY="185.0" prefHeight="36.0" prefWidth="116.0" text="Excel admin" textAlignment="CENTER">
+         <font>
+            <Font name="Arial" size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="81.0" layoutY="221.0" text="Number of questions" />
+      <TextField fx:id="numQuestions" layoutX="239.0" layoutY="217.0" prefHeight="17.0" prefWidth="25.0" />
+      <ListView fx:id="questionsListView" layoutX="76.0" layoutY="270.0" prefHeight="216.0" prefWidth="245.0" />
+      <Button layoutX="88.0" layoutY="524.0" mnemonicParsing="false" onAction="#saveAndReturPressed" prefHeight="36.0" prefWidth="222.0" text="Save &amp; return" />
+      <Label layoutX="76.0" layoutY="246.0" prefHeight="16.0" prefWidth="245.0" text="     #   |  Description |   Excel column" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="583.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.javaCode.gui.JavaGuiController">
+   <children>
+      <Label layoutX="20.0" layoutY="32.0" prefHeight="17.0" prefWidth="149.0" text="Zip file" />
+      <Button fx:id="chooseFileButton" layoutX="204.0" layoutY="27.0" mnemonicParsing="false" onAction="#chooseFilePressed" prefHeight="25.0" prefWidth="127.0" text="Choose File" />
+      <TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="17.0" layoutY="348.0" prefHeight="227.0" prefWidth="354.0" wrapText="true" />
+      <Label layoutX="14.0" layoutY="66.0" prefHeight="17.0" prefWidth="149.0" text="Append files with:" />
+      <TextField fx:id="appendText" layoutX="182.0" layoutY="62.0" />
+      <Button layoutX="173.0" layoutY="130.0" mnemonicParsing="false" onAction="#unzipAppendOpen" text="Unzip Append &amp; Open" />
+      <Button layoutX="63.0" layoutY="93.0" mnemonicParsing="false" onAction="#unZip" text="Unzip" />
+      <Button layoutX="151.0" layoutY="93.0" mnemonicParsing="false" onAction="#append" text="Append" />
+      <Button layoutX="243.0" layoutY="93.0" mnemonicParsing="false" onAction="#open" text="Open" />
+      <Button layoutX="47.0" layoutY="130.0" mnemonicParsing="false" onAction="#unzipAppend" text="Unzip Append" />
+      <Line endX="100.0" layoutX="190.0" layoutY="164.0" startX="-100.0" />
+      <TextField fx:id="checkString" layoutX="192.0" layoutY="167.0" />
+      <Label layoutX="24.0" layoutY="171.0" prefHeight="17.0" prefWidth="149.0" text="Check for String" />
+      <Button layoutX="138.0" layoutY="194.0" mnemonicParsing="false" onAction="#check" text="Check" />
+      <Button layoutX="103.0" layoutY="236.0" mnemonicParsing="false" onAction="#read" text="Read and show marks" />
+      <Button layoutX="153.0" layoutY="315.0" mnemonicParsing="false" onAction="#zipUp" text="Zip marked" />
+      <Label layoutX="24.0" layoutY="283.0" prefHeight="17.0" prefWidth="149.0" text="zip file suffix" textAlignment="RIGHT" textFill="#2ad114" />
+      <TextField fx:id="suffix" layoutX="192.0" layoutY="279.0" />
+      <Line endX="100.0" layoutX="173.0" layoutY="228.0" startX="-100.0" />
+      <MenuBar fx:id="menu" prefHeight="25.0" prefWidth="385.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</AnchorPane>

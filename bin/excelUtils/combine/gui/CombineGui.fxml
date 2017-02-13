@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="583.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="excelUtils.combine.gui.CombineGuiController">
+   <children>
+      <Label layoutX="20.0" layoutY="32.0" prefHeight="17.0" prefWidth="149.0" text="Final Excel file" />
+      <Button fx:id="chooseFileButton" layoutX="204.0" layoutY="27.0" mnemonicParsing="false" onAction="#chooseFilePressed" prefHeight="25.0" prefWidth="127.0" text="Choose File" />
+      <TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="17.0" layoutY="348.0" prefHeight="227.0" prefWidth="354.0" wrapText="true" />
+      <Button layoutX="147.0" layoutY="314.0" mnemonicParsing="false" onAction="#combinePressed" prefHeight="27.0" prefWidth="112.0" text="Combine!" />
+      <Label layoutX="154.0" layoutY="104.0" prefHeight="17.0" prefWidth="79.0" text="Other files" />
+      <MenuBar fx:id="menu" prefHeight="25.0" prefWidth="387.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ListView fx:id="fileListView" layoutX="25.0" layoutY="138.0" prefHeight="164.0" prefWidth="338.0" />
+      <Button fx:id="chooseFileButton1" layoutX="131.0" layoutY="67.0" mnemonicParsing="false" onAction="#configureSettingsPressed" prefHeight="27.0" prefWidth="127.0" text="Configure settings" />
+   </children>
+</AnchorPane>

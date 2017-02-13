@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="583.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.written.gui.MarksController">
+	<children>
+		<Label focusTraversable="false" layoutX="25.0" layoutY="81.0" prefHeight="17.0" prefWidth="161.0" text="Search student" />
+		<Label focusTraversable="false" layoutX="66.0" layoutY="32.0" prefHeight="17.0" prefWidth="97.0" text="Chosen File:" />
+		<Label focusTraversable="false" layoutX="25.0" layoutY="127.0" prefHeight="17.0" prefWidth="139.0" text="Enter mark" />
+		<VBox fx:id="hBoxContainer" layoutX="150.0" layoutY="74.0" prefHeight="31.0" prefWidth="204.0" />
+		<TextField fx:id="markText" layoutX="186.0" layoutY="123.0" />
+		<Button layoutX="124.0" layoutY="169.0" mnemonicParsing="false" onAction="#addMarkPressed" prefHeight="31.0" prefWidth="161.0" text="Add mark" />
+		<Button focusTraversable="false" layoutX="134.0" layoutY="224.0" mnemonicParsing="false" onAction="#writeMarks" prefHeight="53.0" prefWidth="139.0" text="Write marks to file" />
+
+		<TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="16.0" layoutY="285.0" prefHeight="290.0" prefWidth="354.0" wrapText="true" />
+		<MenuBar fx:id="menu" layoutX="-1.0" prefHeight="25.0" prefWidth="385.0">
+			<menus>
+				<Menu mnemonicParsing="false" text="File">
+					<items>
+						<MenuItem mnemonicParsing="false" text="Close" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="Edit">
+					<items>
+						<MenuItem mnemonicParsing="false" text="Delete" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="Help">
+					<items>
+						<MenuItem mnemonicParsing="false" text="About" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+		<Button focusTraversable="false" layoutX="25.0" layoutY="54.0" mnemonicParsing="false" onAction="#configurePressed" prefHeight="27.0" prefWidth="82.0" text="Configure" />
+      <Label fx:id="fileNameLabel" layoutX="191.0" layoutY="33.0" prefHeight="16.0" prefWidth="122.0" text="No file chosen" />
+	</children>
+</AnchorPane>

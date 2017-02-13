@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="583.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.exam.gui.ExamMarksController">
+   <children>
+      <Label layoutX="25.0" layoutY="75.0" prefHeight="17.0" prefWidth="161.0" text="Search student" />
+      <Label layoutX="20.0" layoutY="42.0" prefHeight="17.0" prefWidth="149.0" text="Class list xlsx file:" />
+      <Label layoutX="146.0" layoutY="100.0" prefHeight="17.0" prefWidth="106.0" text="Enter mark(s)" />
+      <Button fx:id="chooseFileButton" layoutX="204.0" layoutY="37.0" mnemonicParsing="false" onAction="#chooseFilePressed" prefHeight="25.0" prefWidth="127.0" text="Choose File" />
+      <Button layoutX="124.0" layoutY="397.0" mnemonicParsing="false" onAction="#addMarkPressed" prefHeight="31.0" prefWidth="161.0" text="Add mark" />
+      <Button layoutX="135.0" layoutY="448.0" mnemonicParsing="false" onAction="#writeMarks" prefHeight="27.0" prefWidth="139.0" text="Write marks to file" />
+      <VBox fx:id="hBoxContainer" layoutX="150.0" layoutY="68.0" prefHeight="31.0" prefWidth="204.0" />
+      <TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="16.0" layoutY="486.0" prefHeight="89.0" prefWidth="354.0" wrapText="true" />
+      <ListView fx:id="marksListView" layoutX="24.0" layoutY="131.0" prefHeight="258.0" prefWidth="338.0" />
+      <Button layoutX="33.0" layoutY="95.0" mnemonicParsing="false" onAction="#configureButtonPressed" text="Configure" />
+      <MenuBar fx:id="menu" prefHeight="25.0" prefWidth="386.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</AnchorPane>
