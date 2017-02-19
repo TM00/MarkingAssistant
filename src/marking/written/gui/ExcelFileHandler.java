@@ -99,7 +99,7 @@ public class ExcelFileHandler {
 					String in = ExcelUtils.cellToString(initialsCell);
 
 					Student stud = new Student(sur,in, stdNum);
-					stud.setRowNumber(row.getRowNum());
+					stud.setRowNumber(row.getRowNum()); // row num is 0 based (index)
 
 					list.add(stud);
 				}

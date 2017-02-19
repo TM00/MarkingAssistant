@@ -29,6 +29,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import main.AboutController;
 import main.Main;
 import marking.SoundPlayer;
 import marking.written.Student;
@@ -90,7 +91,7 @@ public class MarksController implements TextOutput{
 
 		filePath = f.getAbsolutePath();
 
-		loadExcelFile();
+		displayExcelView();
 	}
 
 	@FXML
@@ -98,10 +99,14 @@ public class MarksController implements TextOutput{
 
 		// Show configure gui...
 		final Stage dialog = new Stage();
-		dialog.initModality(Modality.APPLICATION_MODAL);
+		dialog.initModality(Modality.WINDOW_MODAL);
 		dialog.initOwner(Main.primaryStage);
 		dialog.setTitle("Written Configurations");
 		dialog.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+
+		dialog.setX(Main.primaryStage.getX());
+		dialog.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+
 
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("ConfigureGui.fxml"));
@@ -126,7 +131,7 @@ public class MarksController implements TextOutput{
 
 		// TODO update fields
 		ExcelFileHandler.loadConstantsFromSettings();
-		
+
 		loadExcelFile();
 	}
 
@@ -144,7 +149,9 @@ public class MarksController implements TextOutput{
 		if(stud != null){
 			stud.setMark(Double.parseDouble(this.markText.getText()));
 
-			excelView.getGrid().setCellValue(stud.getRowNumber(), ExcelUtils.getExcelColumnIndex(Main.settings.markColumnLetter)+1,
+			//			System.out.println(Main.settings.markColumnLetter);
+			//			System.out.println(""+ExcelUtils.getExcelColumnIndex(Main.settings.markColumnLetter));
+			excelView.getGrid().setCellValue(stud.getRowNumber(), ExcelUtils.getExcelColumnIndex(Main.settings.markColumnLetter),
 					markText.getText());
 
 			autoTex.setText("");
@@ -218,9 +225,12 @@ public class MarksController implements TextOutput{
 
 	@FXML
 	void initialize() {
-		assert markText != null : "fx:id=\"markText\" was not injected: check your FXML file 'Gui.fxml'.";
-		assert hBoxContainer != null : "fx:id=\"hBoxContainer\" was not injected: check your FXML file 'Gui.fxml'.";
+		assert infoText != null : "fx:id=\"infoText\" was not injected: check your FXML file 'Gui.fxml'.";
 		assert fileNameLabel != null : "fx:id=\"fileNameLabel\" was not injected: check your FXML file 'Gui.fxml'.";
+		assert markText != null : "fx:id=\"markText\" was not injected: check your FXML file 'Gui.fxml'.";
+		assert mainPane != null : "fx:id=\"mainPane\" was not injected: check your FXML file 'Gui.fxml'.";
+		assert menu != null : "fx:id=\"menu\" was not injected: check your FXML file 'Gui.fxml'.";
+		assert hBoxContainer != null : "fx:id=\"hBoxContainer\" was not injected: check your FXML file 'Gui.fxml'.";
 
 		// Menu
 		Main.createMenu(menu);
@@ -237,7 +247,6 @@ public class MarksController implements TextOutput{
 					chooseFilePressed(null);
 				}
 			});
-
 			fileMenu.getItems().add(0, choose);
 		}
 
@@ -264,6 +273,19 @@ public class MarksController implements TextOutput{
 
 			EditMenu.getItems().add(0, config);
 			EditMenu.getItems().add(1, refresh);
+		}
+		Menu helpMenu = OtherUtils.getMenuFromBar(menu, "Help");
+		if(helpMenu!=null){
+
+			MenuItem help = new MenuItem("How to use");
+			help.setAccelerator(KeyCombination.keyCombination("Shortcut+H"));
+			help.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent t) {
+					Main.showHelp(getHelpString());
+				}
+			});
+
+			helpMenu.getItems().add(0, help);
 		}
 
 
@@ -332,6 +354,7 @@ public class MarksController implements TextOutput{
 						System.out.println(filePath);
 
 						//	loadExcelFile();
+						displayExcelView();
 
 					}
 
@@ -346,7 +369,7 @@ public class MarksController implements TextOutput{
 		//File Dragging functionality...  END
 
 		this.infoText.setFocusTraversable(false);
-		
+
 		this.autoTex.requestFocus();
 
 
@@ -454,6 +477,21 @@ public class MarksController implements TextOutput{
 		}
 	}
 
+	private void displayExcelView(){
+		if(excelView == null){
+			excelView = new ExcelView(filePath, 0, false);
+			excelView.showInNewWindow();
+		}
+		else{
+			try {
+				excelView.updateView();
+			} catch (Exception e) {
+				displayText("An error occured while updating the Spreadsheet", false);
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/*	private void menuBarStuff(){
 		ObservableList<Menu> menus=menu.getMenus();
 		menus.clear();
@@ -514,5 +552,28 @@ public class MarksController implements TextOutput{
 		}
 	}
 
+	private String getHelpString(){
+		String s="";
+
+		s+="Welcome to the Written help page!\n\n";
+
+		s+="To use the software, follow these steps";
+
+		s+="1. Make sure the column you want to capture the marks to have been created in your Excel file\n\n";
+		s+="2. Make sure your Excel file is closed and backed up to avoid corrupting the file\n\n";
+		s+="3. Drag and drop your Excel file anywhere into the window, after the drop a loading bar will appear\n\n";
+		s+="4. A uneditable preview of the file will open, this may stay open during the capturing. Press the \"Configure\" button and a new window will pop up\n\n";
+		s+="5. Enter the column letters where the specific information is located in your file, you may scroll the preview to search where the info is. "
+				+ "If not all the info is present, don't panic, only the student number and surname letters are essential. You may simply enter dummy letters to the rest. "
+				+ "The row number is the number of the row (indicated on the left on the preview) where the first student information is stored after all the headings etc.\n\n";
+		s+="6. Press \"Save and Return\". The number of students recorded will be indicated in the prompt, or inform you when an error has occured\n\n";
+		s+="7. Nou you may capture the marks by searching for the students by surname or number in the \"search student\" field. Suggestions will appear and you can scroll"
+				+ " with the arrow keys or mouse and select with the ENTER key or double mouse click\n\n";
+		s+="8. After the student is located the mark can be entered in the \"Enter mark\" field\n\n";
+		s+="9. Repeat steps 7 and 8 for all the written tests\n\n";
+		s+="10. After all the marks have been entered, press the \"Write marks to file\" button to export all the captures marks to the Excel file and voila, you're done :)";
+
+		return s;
+	}
 
 }

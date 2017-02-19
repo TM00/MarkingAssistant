@@ -20,9 +20,12 @@ import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import main.Main;
 import marking.SoundPlayer;
 import marking.written.gui.ExcelFileHandler;
 import res.ResourceLoader;
@@ -81,51 +84,84 @@ public class ExcelView {
 
 	public void showInNewWindow(){
 
+		if(Main.settings.playLoadingSound)
+			SoundPlayer.startLoopSound();
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Busy Reading");
+		alert.setHeaderText("Please wait...");
+
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+
+
 		try {
 
 			Task<Integer> task = new Task<Integer>() {
 				@Override protected Integer call() throws Exception {
+					try {
+						alert.show();
+						initializeView();
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw e;
+					}
 
-					initializeView();
 
 					return new Integer(2);
 				}
 
 				@Override protected void succeeded() {
+
 					super.succeeded();
 					updateMessage("Done!");
 					System.out.println("Done!");
-					Parent root;
-					root = theView;
-					stage = new Stage();
-					Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
-					// stage positioning
-					stage.setX(primaryScreenBounds.getMinX());
-					stage.setY(primaryScreenBounds.getMinY());
-					stage.setWidth(primaryScreenBounds.getWidth()/2);
-					stage.setHeight(primaryScreenBounds.getHeight());
+					try{
 
-					stage.setTitle(new File(filePath).getName());
-					stage.setScene(new Scene(root));
+						Parent root;
+						root = theView;
+						stage = new Stage();
+						Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
-					stage.getIcons().addAll(ResourceLoader.getIcons("Excel.ico"));		
+						// stage positioning
+						stage.setX(primaryScreenBounds.getMinX());
+						stage.setY(primaryScreenBounds.getMinY());
+						stage.setWidth(primaryScreenBounds.getWidth()/2);
+						stage.setHeight(primaryScreenBounds.getHeight());
 
-					stage.initModality(Modality.WINDOW_MODAL);
-					stage.show();
+						stage.setTitle(new File(filePath).getName());
+						stage.setScene(new Scene(root));
+
+						stage.getIcons().addAll(ResourceLoader.getIcons("Excel.ico"));		
+
+						stage.initModality(Modality.NONE);
+						stage.show();
+
+						SoundPlayer.stopPlayingSound();
+						alert.close();
+
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				@Override protected void cancelled() {
 					super.cancelled();
 					updateMessage("Cancelled!");
 					System.out.println("Cancelled");
-
+					SoundPlayer.stopPlayingSound();
+					alert.close();
 				}
 
 				@Override protected void failed() {
 					super.failed();
 					updateMessage("Failed!");
 					System.out.println("Failed");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
 
 				}
 			};
@@ -176,12 +212,22 @@ public class ExcelView {
 		for (int row = 0; row < grid.getRowCount(); ++row) {
 			final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
 			poiRow = poiSheet.getRow(row);
-			for (int column = 0; column < grid.getColumnCount(); ++column) {
 
-				cell = poiRow.getCell(column);
-				value = ExcelUtils.cellStringValue(evaluator,cell);
+			if(poiRow == null){
+				for (int column = 0; column < grid.getColumnCount(); ++column) {
 
-				list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,value));
+					value = "";
+					list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,value));
+				}
+			}
+			else{
+				for (int column = 0; column < grid.getColumnCount(); ++column) {
+
+					cell = poiRow.getCell(column);
+					value = ExcelUtils.cellStringValue(evaluator,cell).trim();
+
+					list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,value));
+				}
 			}
 			rows.add(list);
 		}

@@ -85,31 +85,42 @@ public class AutoCompleteTextField2 extends TextField {
 				entriesPopup.hide();
 			}
 		});
-		
+
 		addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-	        @Override
-	        public void handle(KeyEvent event) {
-	            if (event.getCode() == KeyCode.TAB) {
-	            	
-	            	TextFieldSkin  skin = (TextFieldSkin) getSkin();
-	                if (skin.getBehavior() instanceof TextFieldBehavior) {
-	                	TextFieldBehavior behavior = (TextFieldBehavior) skin.getBehavior();
-	                	
-	                	
-	                	
-	                        behavior.callAction("TraverseNext");
-	                    
-	                    event.consume();
-	                }
+			@Override
+			public void handle(KeyEvent event) {
+				if (event.getCode() == KeyCode.TAB) {
 
-	            }
-	        }
-	    });
+					TextFieldSkin  skin = (TextFieldSkin) getSkin();
+					if (skin.getBehavior() instanceof TextFieldBehavior) {
+						TextFieldBehavior behavior = (TextFieldBehavior) skin.getBehavior();
 
 
+						behavior.callAction("TraverseNext");
+
+						event.consume();
+					}
+
+				}
+			}
+		});
 
 
+		// Tried 16/2/2017 - failed
+		entriesPopup.addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
 
+			@Override
+			public void handle(KeyEvent event) {
+				System.out.println("KeyEvent called_1");
+
+				if (event.getCode() == KeyCode.TAB) {
+
+
+				}
+
+
+			}
+		});
 	}
 
 	private void setSelectedSuggestionAsTextAndMoveFocus(){
@@ -138,25 +149,26 @@ public class AutoCompleteTextField2 extends TextField {
 
 
 			CustomMenuItem item = new CustomMenuItem(entryLabel, true);
+
 			item.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
 				public void handle(ActionEvent actionEvent) {
 					System.out.println("Handling action event");
 					setText(result);
-					
-					entriesPopup.hide();
-					
 
-				//	fireActionEvent();
-				//	nextFocus();
+					entriesPopup.hide();
+
+
+					//	fireActionEvent();
+					//	nextFocus();
 
 				}
 			});
 
-			/*			
+
 			// NOT WORKING!!
-			item.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			item.addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
 				public void handle(KeyEvent e) { 
 					System.out.println("KeyEvent called");
 					if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.TAB)  {
@@ -165,7 +177,7 @@ public class AutoCompleteTextField2 extends TextField {
 					}
 				};  
 			});
-			 */
+
 			menuItems.add(item);
 		}
 		entriesPopup.getItems().clear();
@@ -174,7 +186,7 @@ public class AutoCompleteTextField2 extends TextField {
 
 
 	}
-	
+
 	private void fireActionEvent(){
 		this.fireEvent(new ActionEvent());
 	}

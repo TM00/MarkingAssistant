@@ -14,14 +14,11 @@
 				<Font name="Arial" size="20.0" />
 			</font>
 		</Label>
-		<TextField fx:id="initials" layoutX="197.0" layoutY="65.0" prefHeight="17.0" prefWidth="25.0" />
-		<TextField fx:id="surname" layoutX="197.0" layoutY="102.0" prefHeight="17.0" prefWidth="25.0" />
-		<TextField fx:id="stNum" layoutX="197.0" layoutY="138.0" prefHeight="17.0" prefWidth="25.0" />
-		<TextField fx:id="mark" layoutX="197.0" layoutY="175.0" prefHeight="17.0" prefWidth="25.0" />
-		<TextField fx:id="rowIndex" layoutX="197.0" layoutY="210.0" prefHeight="17.0" prefWidth="25.0" />
-
-
-
+		<TextField fx:id="initials" layoutX="197.0" layoutY="65.0" prefHeight="17.0" prefWidth="40.0" />
+		<TextField fx:id="surname" layoutX="197.0" layoutY="102.0" prefHeight="17.0" prefWidth="40.0" />
+		<TextField fx:id="stNum" layoutX="197.0" layoutY="138.0" prefHeight="17.0" prefWidth="40.0" />
+		<TextField fx:id="mark" layoutX="197.0" layoutY="175.0" prefHeight="17.0" prefWidth="40.0" />
+		<TextField fx:id="rowIndex" layoutX="197.0" layoutY="210.0" prefHeight="25.0" prefWidth="40.0" />
 
 		<Label layoutX="39.0" layoutY="214.0" text="Start row" />
 		<Label layoutX="53.0" layoutY="180.0" text="Mark Column" />

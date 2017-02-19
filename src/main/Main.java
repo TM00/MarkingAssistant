@@ -29,6 +29,7 @@ import marking.TabbedController;
 import marking.exam.gui.ConfigData;
 import marking.exam.gui.ExamMarksController;
 import marking.javaCode.gui.JavaGuiController;
+import marking.written.gui.ConfigureController;
 import marking.written.gui.MarksController;
 import preloader.PreloadController;
 import res.ResourceLoader;
@@ -47,31 +48,38 @@ public class Main extends Application {
 		try {
 
 			/*
-			 GENERAL COMMENTS: 
+			 GENERAL COMMENTS + TODO: 
 
 		      autofill text box - Tab key to select
-			 
 
-			  Enter button should trigger add mark when the mark input has focus
 
 			 - Control where the focus goes after entering/adding the mark, eg to the name textfield for the next entry
 
 			 // Revamp TODO
 			    Styling at end...
-			   
+
 			    Settings, point to notePad++ of ander text editor?  ipv hele ding insit
 			    personal settings in elke scene se eie menu insit... dit sal beter wees
 
 			   // Excel file combine.. goed test
-			   
-			   * ExcelView se loading in nuwe Thread
-			    
-			   NB: currently excel opens when dragged and is read in, but settings might not yet be set? 
-			   maybe have a re-read option? 
-			   
+
+
 			   should move choose file button to a menu option and replace space with re-read button? 
-			   
-			    * help option in menuBar for instructions instead of in textArea
+
+			 * help option in menuBar for instructions instead of in textArea + About
+
+			 * From stackoverflow: 
+			    This seems likes a very fine example! Maybe you could improve it by 
+			    detecting the type of data you have in Excel and use the SpreadsheetCellType 
+			    according to it. You can also detect the Excel format and set it in the cell 
+			    if you want to
+
+			 *hidden cells in display...
+			 *
+			 *Undo knoppie - Kan net die punt weer insit, dalk vir exam? Dink dis dieselfde
+			 *
+			 *Viewer skuif 'n kolom aan as twee punte vir dieselfde student inlees - Voorlopig reg dink ek
+			 *
 
 			 */
 			Main.primaryStage=primaryStage;
@@ -86,25 +94,25 @@ public class Main extends Application {
 
 			//AnchorPane page = (AnchorPane) FXMLLoader.load(Main.class.getResource("TabbedGui.fxml"));
 			AnchorPane page = (AnchorPane) FXMLLoader.load(PreloadController.class.getResource("PreloaderGUI.fxml"));
-			
+
 			//			MarksController mc = (MarksController) fxmlLoader.getController();
 			Scene scene = new Scene(page);
 			scene.getStylesheets().add(PreloadController.class.getResource("application.css").toExternalForm());
-			
+
 			//	primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("Marking");
-			
+
 			//			Student.outText=mc;
-			
+
 			// Stage positioning
 			Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
 			// stage positioning
 			primaryStage.setX(primaryScreenBounds.getMaxX()*5/8);
 			primaryStage.setY(primaryScreenBounds.getMinY() + page.getPrefHeight()*2/4);
-			
-			
+
+
 			primaryStage.show();
 			primaryStage.setResizable(false);
 
@@ -135,7 +143,7 @@ public class Main extends Application {
 			dialog.initOwner(Main.primaryStage);
 			dialog.setTitle("Select a service");
 			dialog.setResizable(false);
-			
+
 			dialog.setX(primaryStage.getX());
 			dialog.setY(primaryStage.getY()+primaryStage.getWidth()/2);
 			dialog.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));		
@@ -158,6 +166,73 @@ public class Main extends Application {
 	}
 
 	/**
+	 * This option shoes the about menu that explains the software etc...
+	 */
+	public static void showAbout(){
+
+		// Show configure gui...
+		final Stage dialog = new Stage();
+		dialog.initModality(Modality.APPLICATION_MODAL);
+		dialog.initOwner(Main.primaryStage);
+		dialog.setTitle("About");
+		dialog.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+
+		dialog.setX(Main.primaryStage.getX());
+		dialog.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+
+
+		try {
+			FXMLLoader fxmlLoader = new FXMLLoader(AboutController.class.getResource("AboutGui.fxml"));
+
+			AnchorPane page = (AnchorPane) fxmlLoader.load();
+			//ConfigureController fooController = (ConfigureController) fxmlLoader.getController();
+			//fooController.setStage(dialog);		
+			//fooController.setParent(this);
+			//	fooController.loadData();
+			Scene dialogScene = new Scene(page);
+
+			dialog.setScene(dialogScene);
+			dialog.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * This option shoes the help menu that explains how to use the software...
+	 */
+	public static void showHelp(String helpString){
+
+		// Show help gui...
+		final Stage dialog = new Stage();
+		dialog.initModality(Modality.APPLICATION_MODAL);
+		dialog.initOwner(Main.primaryStage);
+		dialog.setTitle("Help");
+		dialog.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+
+		dialog.setX(Main.primaryStage.getX());
+		dialog.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+
+
+		try {
+			FXMLLoader fxmlLoader = new FXMLLoader(AboutController.class.getResource("AboutGui.fxml"));
+
+			AnchorPane page = (AnchorPane) fxmlLoader.load();
+			AboutController fooController = (AboutController) fxmlLoader.getController();
+			fooController.setInfoText(helpString);	
+			//fooController.setParent(this);
+			//	fooController.loadData();
+			Scene dialogScene = new Scene(page);
+
+			dialog.setScene(dialogScene);
+			dialog.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
 	 * Switches between windows
 	 * @param number
 	 */
@@ -166,7 +241,7 @@ public class Main extends Application {
 
 			BorderPane borderPane = new BorderPane();
 			borderPane.setTop(menuBar);
-			
+
 
 			AnchorPane page;
 			switch (number) {
@@ -259,16 +334,24 @@ public class Main extends Application {
 		});
 		menuView.getItems().add(goToStart);
 
+		// --- Menu View
+		Menu menuHelp = new Menu("Help");
 
+		MenuItem about = new MenuItem("About");
+		about.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent t) {
 
-		menuBar.getMenus().addAll(menuFile, menuEdit, menuView);
-
+				Main.showAbout();
+			}
+		});
+		menuHelp.getItems().add(about);
+		menuBar.getMenus().addAll(menuFile, menuEdit, menuView,menuHelp);
 	}
 
 	public static void main(String[] args) {
 
-		
-		
+
+
 		launch(args);
 
 	}
