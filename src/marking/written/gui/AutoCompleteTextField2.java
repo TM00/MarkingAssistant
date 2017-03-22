@@ -1,11 +1,12 @@
 package marking.written.gui;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.sun.javafx.scene.control.behavior.TextAreaBehavior;
 import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
 import com.sun.javafx.scene.control.skin.BehaviorSkinBase;
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
@@ -22,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import utils.CustomTextEventHandler;
 
 @SuppressWarnings("restriction")
 public class AutoCompleteTextField2 extends TextField {
@@ -33,6 +35,8 @@ public class AutoCompleteTextField2 extends TextField {
 
 	private boolean caseSensitive; // false by default
 	private ContextMenuContent.MenuItemContainer itemSelected=null;
+	
+	private Set<CustomTextEventHandler> customHandlers;
 
 	/** Construct a new AutoCompleteTextField. */
 	public AutoCompleteTextField2() {
@@ -40,6 +44,8 @@ public class AutoCompleteTextField2 extends TextField {
 		entries = new TreeSet<>();
 		entriesPopup = new ContextMenu();
 		caseSensitive=false;
+		customHandlers = new HashSet<>();
+		
 		textProperty().addListener(new ChangeListener<String>()
 		{
 			@Override
@@ -122,6 +128,10 @@ public class AutoCompleteTextField2 extends TextField {
 			}
 		});
 	}
+	
+	public void addCustomHandler(CustomTextEventHandler c){
+		customHandlers.add(c);
+	}
 
 	private void setSelectedSuggestionAsTextAndMoveFocus(){
 		//		entriesPopup.g
@@ -160,7 +170,7 @@ public class AutoCompleteTextField2 extends TextField {
 					entriesPopup.hide();
 
 
-					//	fireActionEvent();
+						fireActionEvent(actionEvent);
 					//	nextFocus();
 
 				}
@@ -187,8 +197,12 @@ public class AutoCompleteTextField2 extends TextField {
 
 	}
 
-	private void fireActionEvent(){
-		this.fireEvent(new ActionEvent());
+	private void fireActionEvent(ActionEvent ac){
+		System.out.println("firing action evennt...");
+		
+		customHandlers.forEach(e -> e.handleCustonTextEvent("ACTION"));
+		
+		this.fireEvent(ac);
 	}
 
 	private void nextFocus(){

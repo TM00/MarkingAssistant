@@ -29,7 +29,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import main.AboutController;
 import main.Main;
 import marking.SoundPlayer;
 import marking.written.Student;

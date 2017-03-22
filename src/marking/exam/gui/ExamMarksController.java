@@ -1,9 +1,9 @@
 package marking.exam.gui;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -23,11 +23,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -39,13 +42,15 @@ import main.Main;
 import marking.SoundPlayer;
 import marking.exam.ExamStudent;
 import marking.exam.ExamStudentList;
-import marking.written.Student;
 import marking.written.gui.AutoCompleteTextField2;
-import marking.written.gui.ExcelFileHandler;
 import marking.written.gui.TextOutput;
 import res.ResourceLoader;
+import utils.CustomTextEventHandler;
+import utils.ExcelUtils;
+import utils.ExcelView;
+import utils.OtherUtils;
 
-public class ExamMarksController implements TextOutput{
+public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 
 	@FXML
 	private ResourceBundle resources;
@@ -78,6 +83,7 @@ public class ExamMarksController implements TextOutput{
 	//	private final AutoCompleteTextField autoTex = new AutoCompleteTextField();
 	private final AutoCompleteTextField2 autoTex = new AutoCompleteTextField2();
 	//private static URL settingsResource;
+	private static ExcelView excelView;
 
 	private ObservableList<StudentExamListData> data;
 
@@ -86,10 +92,13 @@ public class ExamMarksController implements TextOutput{
 
 		// Show configure gui...
 		final Stage dialog = new Stage();
-		dialog.initModality(Modality.APPLICATION_MODAL);
+		dialog.initModality(Modality.WINDOW_MODAL);
 		dialog.initOwner(Main.primaryStage);
 		dialog.setTitle("Exam Configurations");
 		dialog.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+
+		dialog.setX(Main.primaryStage.getX());
+		dialog.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
 
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("ConfigureGui.fxml"));
@@ -98,6 +107,7 @@ public class ExamMarksController implements TextOutput{
 			ConfigureController fooController = (ConfigureController) fxmlLoader.getController();
 			fooController.setStage(dialog);		
 			fooController.setParent(this);
+			fooController.loadData();
 			Scene dialogScene = new Scene(page);
 
 			dialog.setScene(dialogScene);
@@ -114,6 +124,9 @@ public class ExamMarksController implements TextOutput{
 
 
 		// TODO update fields
+		ExamExcelHandler.loadConstantsFromConfigData();
+
+		loadExcelFile();
 
 
 	}
@@ -130,13 +143,13 @@ public class ExamMarksController implements TextOutput{
 		//		hBoxContainer.getChildren().addAll(autoTex);
 
 
-		File f = ExcelFileHandler.getFile();
+		File f = ExamExcelHandler.getFile();
 		chooseFileButton.setText(f.getName());
 
 		filePath = f.getAbsolutePath();
 
-		ExcelFileHandler.setFilePath_to_excel(filePath);
-		ExcelFileHandler.loadConstantsFromSettings();
+		ExamExcelHandler.setFilePath_to_excel(filePath);
+		ExamExcelHandler.loadConstantsFromConfigData();
 
 
 		list=ExamExcelHandler.readExamStudentListFromFile();
@@ -158,11 +171,40 @@ public class ExamMarksController implements TextOutput{
 		ExamStudent student = list.getStudent(selected);
 
 		if(student != null){
+			int counter =0;
+			ConfigListData dat, total = null;
 			for (StudentExamListData studentExamListData : data) {
-				student.addMark(studentExamListData.getQuestionNumber()+"", studentExamListData.getMark());
+				student.setMark(studentExamListData.getQuestionNumber()+"", studentExamListData.getMark());
+				//				excelView.getGrid().setCellValue(student.getRowNumber(), ExcelUtils.getExcelColumnIndex(Main.configData.questionData.get(counter).getExcelColumn()),
+				//						studentExamListData.getMark()+"");
+
+				dat = Main.configData.questionData.get(counter);
+				System.out.println("name = "+dat.getName());
+				if(!dat.getName().equals("TOTAL") && Main.configData.writeQuestions){
+					excelView.setCellValue(student.getRowNumber(), ExcelUtils.getExcelColumnIndex(dat.getExcelColumn()),
+							studentExamListData.getMark()+"");
+				}
+				counter++;
+			}
+			
+			// find total
+			for(ConfigListData d: Main.configData.questionData){
+				if(d.getName().equals("TOTAL")){
+					total = Main.configData.questionData.get(counter);
+					break;
+				}
+			}
+			
+			if(Main.configData.writeTotal && total !=null){
+				excelView.setCellValue(student.getRowNumber(), ExcelUtils.getExcelColumnIndex(total.getExcelColumn()),
+						student.getTotalMark()+"");
 			}
 
-			infoText.appendText("Total for "+student.getStudentNumber()+" = "+student.getTotalMark()+"\n\n");
+			double percentage = student.getTotalMark()/Main.configData.totalPaper*100;
+			DecimalFormat df = new DecimalFormat("##.0");
+
+			infoText.appendText("Total for "+student.getStudentNumber()+" = "+student.getTotalMark()+"\n");
+			infoText.appendText("\t Percentage = "+df.format(percentage)+" % "+"\n\n");
 
 			autoTex.setText("");
 
@@ -186,7 +228,7 @@ public class ExamMarksController implements TextOutput{
 			@Override protected Integer call() throws Exception {
 				alert.show();
 				System.out.println("Started");
-				ExamExcelHandler.writeExamStudentMarksToFile(list);
+				ExamExcelHandler.writeExamStudentMarksToFile(list, Main.configData.writeQuestions, Main.configData.writeTotal);
 
 				System.out.println("DONE!!");
 				displayText("Succesfully written to the file...",true);	
@@ -231,7 +273,65 @@ public class ExamMarksController implements TextOutput{
 		assert marksListView != null : "fx:id=\"marksListView\" was not injected: check your FXML file 'Gui.fxml'.";
 
 		// Menu
+		// Menu
 		Main.createMenu(menu);
+		// Add choose file option
+
+		Menu fileMenu = OtherUtils.getMenuFromBar(menu, "File");
+
+		if(fileMenu!=null){
+
+			MenuItem choose = new MenuItem("Choose File");
+			choose.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
+			choose.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent t) {
+					chooseFilePressed(null);
+				}
+			});
+			fileMenu.getItems().add(0, choose);
+		}
+
+		Menu EditMenu = OtherUtils.getMenuFromBar(menu, "Edit");
+
+		if(EditMenu!=null){
+
+			MenuItem config = new MenuItem("Configure");
+			config.setAccelerator(KeyCombination.keyCombination("Ctrl+C"));
+			config.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent t) {
+					configureButtonPressed(null);
+				}
+			});
+
+			MenuItem refresh = new MenuItem("Refresh data");
+			refresh.setAccelerator(KeyCombination.keyCombination("Ctrl+R"));
+			refresh.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent t) {
+					loadExcelFile();
+				}
+
+			});
+
+			EditMenu.getItems().add(0, config);
+			EditMenu.getItems().add(1, refresh);
+		}
+		Menu helpMenu = OtherUtils.getMenuFromBar(menu, "Help");
+		if(helpMenu!=null){
+
+			MenuItem help = new MenuItem("How to use");
+			help.setAccelerator(KeyCombination.keyCombination("Shortcut+H"));
+			help.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent t) {
+					Main.showHelp(getHelpString());
+				}
+			});
+
+			helpMenu.getItems().add(0, help);
+		}
+
+
+		// Done with menu
+		autoTex.addCustomHandler(this);
 		hBoxContainer.getChildren().addAll(autoTex);
 		/*	markText.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
@@ -240,11 +340,9 @@ public class ExamMarksController implements TextOutput{
 					addMarkPressed(null);
 				}
 			}
-		});
-		 */
+		});*/
 
 		//File Dragging functionality...  START
-
 
 		mainPane.setOnDragOver(new EventHandler<DragEvent>(){
 
@@ -295,57 +393,7 @@ public class ExamMarksController implements TextOutput{
 						filePath= file.getAbsolutePath();
 						System.out.println(filePath);
 
-						if(Main.settings.playLoadingSound)
-							SoundPlayer.startLoopSound();
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Busy Reading");
-						alert.setHeaderText("Please wait...");
-						Task<Integer> task = new Task<Integer>() {
-							@Override protected Integer call() throws Exception {
-
-								alert.show();
-								System.out.println("Started");
-								ExamExcelHandler.setFilePath_to_excel(filePath);
-
-								ExamExcelHandler.loadConstantsFromConfigData();
-
-
-								list=ExamExcelHandler.readExamStudentListFromFile();
-								return new Integer(2);
-							}
-
-							@Override protected void succeeded() {
-								super.succeeded();
-								updateMessage("Done!");
-								System.out.println("Done!");
-								SoundPlayer.stopPlayingSound();
-								alert.close();
-							}
-
-							@Override protected void cancelled() {
-								super.cancelled();
-								updateMessage("Cancelled!");
-								System.out.println("Cancelled");
-								infoText.appendText("\nAn error ocurred ");
-								SoundPlayer.stopPlayingSound();
-								alert.close();
-							}
-
-							@Override protected void failed() {
-								super.failed();
-								updateMessage("Failed!");
-								System.out.println("Failed");
-								infoText.appendText("\nAn error ocurred ");
-								SoundPlayer.stopPlayingSound();
-								alert.close();
-							}
-						};
-						task.run();
-
-
-						//						fillbox.setData(list.getObservableList());
-						autoTex.getEntries().addAll(list.getObservableList());
-						autoTex.setCaseSensitive(false);
+						displayExcelView();
 
 					}
 
@@ -355,32 +403,35 @@ public class ExamMarksController implements TextOutput{
 			}
 		});
 
-
-
 		//File Dragging functionality...  END
 
 		this.infoText.setFocusTraversable(false);
 		this.chooseFileButton.setFocusTraversable(false);
 		this.autoTex.requestFocus();
 
-
 		ExamStudent.outText=this;
 
-		String def  = "Welcome to the mark logging program!!\n"
-				+ "This program lets you log marks to an excel file\n"
-				+ "HOW IT WORKS: You first need to create the column you want the marks to be entered in and specify this column in Settings. "
+		String def  = "Welcome to the exam mark logging program!!\n"
+				+ "This program lets you log marks for different\n"
+				+ "questions to an excel file\n"
+				+ "HOW IT WORKS: You first need to create the column(s) you want the marks to be entered in in your excel file."
 				+ "Then close the excel file. Drag and drop the selected excel file to which the marks should be added. "
+				+ "\n After loading the file, a display of the file should open. Now you mus press the configure buttom to"
+				+ " tell the program where the marks should go and how to locate the candiates with their details. Press save & Return when you're done."
 				+ "The student details are now read by the program. You may continue to enter the student name/number "
-				+ "and select one of the suggestions by pressing the ENTER key. \n"
-				+ "After adding the marks, press the \" Write to file\" button to export the newly added student data to the"
-				+ "excel file.\n"
-				+ "FYI the excel file should be in a specific format such as the one from the example. Additional settings can be set "
+				+ "and select one of the suggestions by pressing the ENTER key. Now you can enter that student's marks for each question in the table"
+				+ "below and press the \"Add Mark\" button to load in into the program. This mark will not be added into the Excel file yet, so you can simply"
+				+ " re-enter it if you made a mistake.\n"
+				+ "After adding the marks, press the \"Write to file\" button to export the newly added student data to the"
+				+ "excel file. This may take a while depending on the amount of students\n"
+				+ "FYI the excel file should be in a specific format such as the one from the example. Also keep a copy of the file in case something goes wrong and avoid losing the file. "
+				+ "Additional settings can be set "
 				+ "by using the settings menu. \n\n";
 		this.infoText.setText(def);
 		//menuBarStuff();
 
 
-		autoTex.setOnAction(new EventHandler<ActionEvent>() {
+		/*autoTex.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -388,7 +439,7 @@ public class ExamMarksController implements TextOutput{
 				setupListView();
 
 			}
-		});
+		});*/
 
 
 	}
@@ -399,14 +450,14 @@ public class ExamMarksController implements TextOutput{
 		data.clear();
 
 		for (ConfigListData c : d) {
-			data.add(new StudentExamListData(c.getNumber(), c.getName()));
+			if(!c.getName().equals("TOTAL"))
+				data.add(new StudentExamListData(c.getNumber(), c.getName()));
 		}
 	}
 
 	private void setupListView(){
 
 		reFreshData();
-
 
 		marksListView.setItems(data);
 		marksListView.setCellFactory(new Callback<ListView<StudentExamListData>, ListCell<StudentExamListData>>() {
@@ -459,6 +510,8 @@ public class ExamMarksController implements TextOutput{
 			}
 
 		});
+
+		marksListView.requestFocus();
 	}
 
 	/*	private void menuBarStuff(){
@@ -522,5 +575,130 @@ public class ExamMarksController implements TextOutput{
 		}
 	}
 
+	/**
+	 * Loads the excel file from the given path
+	 * @throws Exception 
+	 */
+	private void loadExcelFile(){
+		if(Main.settings.playLoadingSound)
+			SoundPlayer.startLoopSound();
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Busy Reading");
+		alert.setHeaderText("Please wait...");
+
+		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		//alert.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+
+		Task<Integer> task = new Task<Integer>() {
+			@Override protected Integer call() throws Exception {
+
+				alert.show();
+				System.out.println("Started");
+				ExamExcelHandler.setFilePath_to_excel(filePath);
+				System.out.println("1...");
+				ExamExcelHandler.loadConstantsFromConfigData();
+				System.out.println("2...");
+
+				list=ExamExcelHandler.readExamStudentListFromFile();
+				System.out.println("3...");
+				return new Integer(2);
+			}
+
+			@Override protected void succeeded() {
+				super.succeeded();
+				updateMessage("Done!");
+				System.out.println("Done!");
+				SoundPlayer.stopPlayingSound();
+				alert.close();
+			}
+
+			@Override protected void cancelled() {
+				super.cancelled();
+				updateMessage("Cancelled!");
+				System.out.println("Cancelled");
+				infoText.appendText("\nAn error ocurred ");
+				SoundPlayer.stopPlayingSound();
+				alert.close();
+			}
+
+			@Override protected void failed() {
+				super.failed();
+				updateMessage("Failed!");
+				System.out.println("Failed");
+				infoText.appendText("\nAn error ocurred ");
+				SoundPlayer.stopPlayingSound();
+				alert.close();
+			}
+		};
+		task.run();
+
+		//						fillbox.setData(list.getObservableList());
+		autoTex.getEntries().addAll(list.getObservableList());
+		autoTex.setCaseSensitive(false);
+
+		if(excelView == null){
+			excelView = new ExcelView(filePath, 0, false);
+			excelView.showInNewWindow();
+		}
+		else{
+			try {
+				excelView.updateView();
+			} catch (Exception e) {
+				displayText("An error occured while updating the Spreadsheet", false);
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void displayExcelView(){
+		if(excelView == null){
+			excelView = new ExcelView(filePath, 0, false);
+			excelView.showInNewWindow();
+		}
+		else{
+			try {
+				excelView.updateView();
+			} catch (Exception e) {
+				displayText("An error occured while updating the Spreadsheet", false);
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private String getHelpString(){
+		String s="";
+
+		s+="Welcome to the Written help page!\n\n";
+
+		s+="To use the software, follow these steps";
+
+		s+="1. Make sure the column you want to capture the marks to have been created in your Excel file\n\n";
+		s+="2. Make sure your Excel file is closed and backed up to avoid corrupting the file\n\n";
+		s+="3. Drag and drop your Excel file anywhere into the window, after the drop a loading bar will appear\n\n";
+		s+="4. A uneditable preview of the file will open, this may stay open during the capturing. Press the \"Configure\" button and a new window will pop up\n\n";
+		s+="5. Enter the column letters where the specific information is located in your file, you may scroll the preview to search where the info is. "
+				+ "If not all the info is present, don't panic, only the student number and surname letters are essential. You may simply enter dummy letters to the rest. "
+				+ "The row number is the number of the row (indicated on the left on the preview) where the first student information is stored after all the headings etc.\n\n";
+		s+="6. Press \"Save and Return\". The number of students recorded will be indicated in the prompt, or inform you when an error has occured\n\n";
+		s+="7. Nou you may capture the marks by searching for the students by surname or number in the \"search student\" field. Suggestions will appear and you can scroll"
+				+ " with the arrow keys or mouse and select with the ENTER key or double mouse click\n\n";
+		s+="8. After the student is located the mark can be entered in the \"Enter mark\" field\n\n";
+		s+="9. Repeat steps 7 and 8 for all the written tests\n\n";
+		s+="10. After all the marks have been entered, press the \"Write marks to file\" button to export all the captures marks to the Excel file and voila, you're done :)";
+
+		return s;
+	}
+
+
+	@Override
+	public void handleCustonTextEvent(String description) {
+		System.err.println("Exam reporting for actions... from handleCustonTextEvent des: "+description);
+		setupListView();
+
+	}
 
 }

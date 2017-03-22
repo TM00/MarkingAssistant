@@ -7,8 +7,11 @@ import java.io.IOException;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import utils.ExcelUtils;
 
 public class NameReader {
 
@@ -25,13 +28,14 @@ public class NameReader {
 		//		String filepath="E:\\Demi\\Inf314\\Klaslys_SVN.xlsx";
 
 		String filepath=filePath_to_excel;
-
 		File myFile = new File(filepath);
 
 		try {
 			FileInputStream fis = new FileInputStream(myFile);
 
 			XSSFWorkbook myWorkBook = new XSSFWorkbook (fis);
+			
+			XSSFFormulaEvaluator eval = new XSSFFormulaEvaluator(myWorkBook);
 
 			XSSFSheet mySheet = myWorkBook.getSheetAt(sheetIndex); // Get iterator to all the rows in current sheet Iterator<Row> rowIterator = mySheet.iterator(); // Traversing over each row of XLSX file while (rowIterator.hasNext()) { Row row = rowIterator.next();
 
@@ -45,7 +49,10 @@ public class NameReader {
 			Cell c;
 			Cell flag;
 			int counter=0;
-			while(true){
+			
+			int nullCounter  =0;
+			int nullLimit  = 20;
+			while(nullCounter< nullLimit){
 
 				row=mySheet.getRow(startrow);
 
@@ -54,17 +61,24 @@ public class NameReader {
 					break;
 
 				}
-				c=row.getCell(cellNum);
+				c=row.getCell(columnIndex);
 				if(c==null){
-					System.out.println("breaking...");	
-					break;
+					nullCounter++;
+//					System.out.println("breaking...");	
+//					break;
 
+				}
+				else{
+					nullCounter=0;
 				}
 				flag=row.getCell(columnIndex);
 				//				if(flag!=null){
 				//					if(flag.getNumericCellValue()==1.){
 				counter++;
-				finalS+=( (int)c.getNumericCellValue())+append;
+				String val = ExcelUtils.cellStringValue(eval,c);
+				System.out.println("val: "+val);
+				if(!val.isEmpty())
+					finalS+=( (int)Double.parseDouble(val)+append);
 				//					}
 				//				}
 

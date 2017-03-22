@@ -22,16 +22,21 @@
       <Label layoutX="83.0" layoutY="116.0" text="St. number Column" />
       <Label layoutX="83.0" layoutY="93.0" text="Surname Column" />
       <Label layoutX="83.0" layoutY="69.0" text="Intials Column" />
-      <Line endX="100.0" layoutX="180.0" layoutY="178.0" startX="-100.0" />
-      <Label layoutX="135.0" layoutY="185.0" prefHeight="36.0" prefWidth="116.0" text="Excel admin" textAlignment="CENTER">
+      <Line endX="100.0" layoutX="180.0" layoutY="168.0" startX="-100.0" />
+      <Label layoutX="136.0" layoutY="171.0" prefHeight="36.0" prefWidth="116.0" text="Excel admin" textAlignment="CENTER">
          <font>
             <Font name="Arial" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="81.0" layoutY="221.0" text="Number of questions" />
-      <TextField fx:id="numQuestions" layoutX="239.0" layoutY="217.0" prefHeight="17.0" prefWidth="25.0" />
-      <ListView fx:id="questionsListView" layoutX="76.0" layoutY="270.0" prefHeight="216.0" prefWidth="245.0" />
+      <Label layoutX="82.0" layoutY="207.0" text="Number of questions" />
+      <TextField fx:id="numQuestions" layoutX="240.0" layoutY="203.0" prefHeight="25.0" prefWidth="36.0" />
+      <ListView fx:id="questionsListView" layoutX="77.0" layoutY="284.0" prefHeight="170.0" prefWidth="245.0" />
       <Button layoutX="88.0" layoutY="524.0" mnemonicParsing="false" onAction="#saveAndReturPressed" prefHeight="36.0" prefWidth="222.0" text="Save &amp; return" />
-      <Label layoutX="76.0" layoutY="246.0" prefHeight="16.0" prefWidth="245.0" text="     #   |  Description |   Excel column" />
+      <Label layoutX="77.0" layoutY="260.0" prefHeight="16.0" prefWidth="245.0" text="     #   |  Description |   Excel column" />
+      <TextField fx:id="paperTotal" layoutX="222.0" layoutY="481.0" prefHeight="25.0" prefWidth="61.0" />
+      <Label layoutX="89.0" layoutY="485.0" text="Total for paper:" />
+      <RadioButton fx:id="writeQuestions" layoutX="164.0" layoutY="234.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="84.0" text="Questions" />
+      <RadioButton fx:id="writeTotal" layoutX="257.0" layoutY="234.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="84.0" text="Total" />
+      <Label layoutX="53.0" layoutY="235.0" text="Write to Excel:" />
    </children>
 </AnchorPane>

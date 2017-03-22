@@ -100,7 +100,9 @@ public class ExamExcelHandler {
 					String sur = ExcelUtils.cellToString(surnameCell);
 					String in = ExcelUtils.cellToString(initialsCell);
 
-					list.add(new ExamStudent(sur,in, stdNum));
+					ExamStudent stud = new ExamStudent(sur,in, stdNum);
+					stud.setRowNumber(row.getRowNum()); // row num is 0 based (index)
+					list.add(stud);
 				}
 
 
@@ -123,7 +125,7 @@ public class ExamExcelHandler {
 			myWorkBook.close();
 			System.out.println("num = "+counter+"\n\n");
 			System.out.println(finalS);
-			Student.outText.displayText("Succesfully read the file, a total of "+counter+" students were recorded.",true);
+			ExamStudent.outText.displayText("Succesfully read the file, a total of "+counter+" students were recorded.",true);
 
 
 		} catch (FileNotFoundException e) {
@@ -138,13 +140,15 @@ public class ExamExcelHandler {
 
 
 	/**Loops throught provided StudentList and assigns corrosponding marks
+	 * @param writeTotal if true, the total is written in its allocated column, false nothing is done
+	 * @param writeQuestions if true, the questions are written in their allocated columns, false nothing is done
 	 * 
 	 * @param filePath_to_excel
 	 * @param studentNumberColumnIndex
 	 * @param markColumnIndex
 	 * @param startrow - Row index where to start looping
 	 */
-	public static void writeExamStudentMarksToFile(ExamStudentList list){
+	public static void writeExamStudentMarksToFile(ExamStudentList list, boolean writeQuestions, boolean writeTotal){
 		int startrow=startRowIndex;
 		String filepath=filePath_to_excel;
 
@@ -163,11 +167,12 @@ public class ExamExcelHandler {
 			Cell stdnumberCell;
 
 			ArrayList<Cell> markCells = new ArrayList<>();
+			Cell totalCell = null; // cell for the total
 			int numQuestions  = Main.configData.questionData.size();
 
 			int counter=0;
 			while(true){
-
+				markCells.clear(); // Start with new Cells :) 
 				row=mySheet.getRow(startrow);
 
 				if(row==null){
@@ -177,14 +182,38 @@ public class ExamExcelHandler {
 
 				stdnumberCell=row.getCell(studentNumberColumnIndex);
 
-				for (int i = 0; i < numQuestions; i++) {
+				if(Main.configData.writeQuestions){ // Only load question cells if required
 
-					markCells.add(i, row.getCell(getExcelColumnIndex(Main.configData.questionData.get(i).getExcelColumn())));
+					ConfigListData dat;
+					for (int i = 0; i < numQuestions; i++) {
 
-					if(markCells.get(i)==null){
-						markCells.add(i, row.createCell(getExcelColumnIndex(Main.configData.questionData.get(i).getExcelColumn())));
+						dat = Main.configData.questionData.get(i);
+						if(!dat.getName().equals("TOTAL")){ // if not the total cell
+							markCells.add(i, row.getCell(getExcelColumnIndex(dat.getExcelColumn())));
+
+							if(markCells.get(i)==null){
+								markCells.set(i, row.createCell(getExcelColumnIndex(dat.getExcelColumn())));
+							}
+						}
 					}
 				}
+				if(Main.configData.writeTotal){ // Only load question cells if required
+					ConfigListData dat;
+					for (int i = 0; i < numQuestions; i++) {
+
+						dat = Main.configData.questionData.get(i);
+
+						if(dat.getName().equals("TOTAL")){ // if  the total cell
+							totalCell = row.getCell(getExcelColumnIndex(dat.getExcelColumn()));
+
+							if(totalCell==null){
+								totalCell =  row.createCell(getExcelColumnIndex(dat.getExcelColumn()));
+							}
+							break; // stop
+						}
+					}
+				}
+
 
 				if(stdnumberCell==null){
 					System.out.println("breaking...");	
@@ -196,17 +225,25 @@ public class ExamExcelHandler {
 					ExamStudent stud = list.getStudentByNumber(stdNum);
 
 					if(stud!=null){ // student in list
-						// TODO
+						// TODO clean code...
 						if(stud.hasMark()){
+
 							Map<String,Double> marks = stud.getMarks();
 							//	marks.keySet().forEach(e -> System.out.println(e));
 							ArrayList<ConfigListData> questionData = Main.configData.questionData;
 
 							Cell mark;
-							for (int i = 0; i < questionData.size(); i++) {
+							//ConfigListData dat;
+							for (int i = 0; i < markCells.size(); i++) { // Will be empty if not writeQuestion = false
 								mark = markCells.get(i);
-								//		System.out.println("n: "+questionData.get(i).getNumber());
+//								System.out.println("n: "+questionData.get(i).getNumber());
+//								System.out.println(marks);
 								mark.setCellValue(marks.get(questionData.get(i).getNumber()+""));
+							}
+
+							// Write total, if needed
+							if(totalCell != null){
+								totalCell.setCellValue(stud.getTotalMark());
 							}
 						}
 						else{
@@ -236,6 +273,7 @@ public class ExamExcelHandler {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			throw e;
 		}
 
 

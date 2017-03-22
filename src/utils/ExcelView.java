@@ -336,5 +336,22 @@ public class ExcelView {
 		return stage;
 	}
 
+	/**
+	 * Sets the cell value in the grid
+	 * 
+	 * @param rowNumber
+	 * @param excelColumnIndex
+	 * @param string
+	 */
+	public void setCellValue(int rowNumber, int excelColumnIndex, String string) {
+		
+		if(theView.getGrid().getColumnCount() <= excelColumnIndex){ // Must expand the view
+			System.err.println("TODO!! ExcelView setCellValue");
+		}
+		
+		getGrid().setCellValue(rowNumber,excelColumnIndex,string);
+		
+	}
+
 
 }

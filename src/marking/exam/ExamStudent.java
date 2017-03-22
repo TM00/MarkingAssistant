@@ -14,6 +14,8 @@ public class ExamStudent {
 	private Map<String,Double> marks;
 	private boolean hasMark;
 	public static TextOutput outText;
+	
+	private int rowNumber;
 
 	public ExamStudent(String surname, String initials, int studentNumber) {
 		super();
@@ -106,6 +108,14 @@ public class ExamStudent {
 	public boolean hasMark() {
 		// TODO Auto-generated method stub
 		return hasMark;
+	}
+	
+	public int getRowNumber() {
+		return rowNumber;
+	}
+
+	public void setRowNumber(int rowIndex) {
+		this.rowNumber = rowIndex;
 	}
 
 }

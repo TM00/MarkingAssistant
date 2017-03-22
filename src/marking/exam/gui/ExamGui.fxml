@@ -11,11 +11,11 @@
       <Label layoutX="20.0" layoutY="42.0" prefHeight="17.0" prefWidth="149.0" text="Class list xlsx file:" />
       <Label layoutX="146.0" layoutY="100.0" prefHeight="17.0" prefWidth="106.0" text="Enter mark(s)" />
       <Button fx:id="chooseFileButton" layoutX="204.0" layoutY="37.0" mnemonicParsing="false" onAction="#chooseFilePressed" prefHeight="25.0" prefWidth="127.0" text="Choose File" />
-      <Button layoutX="124.0" layoutY="397.0" mnemonicParsing="false" onAction="#addMarkPressed" prefHeight="31.0" prefWidth="161.0" text="Add mark" />
-      <Button layoutX="135.0" layoutY="448.0" mnemonicParsing="false" onAction="#writeMarks" prefHeight="27.0" prefWidth="139.0" text="Write marks to file" />
+      <Button layoutX="124.0" layoutY="361.0" mnemonicParsing="false" onAction="#addMarkPressed" prefHeight="31.0" prefWidth="161.0" text="Add mark" />
+      <Button layoutX="135.0" layoutY="412.0" mnemonicParsing="false" onAction="#writeMarks" prefHeight="27.0" prefWidth="139.0" text="Write marks to file" />
       <VBox fx:id="hBoxContainer" layoutX="150.0" layoutY="68.0" prefHeight="31.0" prefWidth="204.0" />
-      <TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="16.0" layoutY="486.0" prefHeight="89.0" prefWidth="354.0" wrapText="true" />
-      <ListView fx:id="marksListView" layoutX="24.0" layoutY="131.0" prefHeight="258.0" prefWidth="338.0" />
+      <TextArea fx:id="infoText" editable="false" focusTraversable="false" layoutX="16.0" layoutY="445.0" prefHeight="130.0" prefWidth="354.0" wrapText="true" />
+      <ListView fx:id="marksListView" layoutX="24.0" layoutY="131.0" prefHeight="220.0" prefWidth="338.0" />
       <Button layoutX="33.0" layoutY="95.0" mnemonicParsing="false" onAction="#configureButtonPressed" text="Configure" />
       <MenuBar fx:id="menu" prefHeight="25.0" prefWidth="386.0">
         <menus>

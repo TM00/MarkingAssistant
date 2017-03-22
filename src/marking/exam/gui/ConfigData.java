@@ -16,5 +16,8 @@ public class ConfigData implements Serializable{
 	public  int startRow;
 	public ArrayList<ConfigListData> questionData;
 	public int numQuestions;
+	public double totalPaper;
+	public boolean writeQuestions;
+	public boolean writeTotal;
 
 }
