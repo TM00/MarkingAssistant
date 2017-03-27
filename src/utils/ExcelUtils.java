@@ -150,6 +150,7 @@ public class ExcelUtils {
 	 * @return
 	 */
 	public static int getExcelColumnIndex(String column) {
+		column  = column.toUpperCase();
 		int result = 0;
 		for (int i = 0; i < column.length(); i++) {
 			result *= 26;
@@ -172,6 +173,6 @@ public class ExcelUtils {
 			sb.append((char)numChar);
 			num = (num  / 26) - 1;
 		}
-		return sb.reverse().toString();
+		return sb.reverse().toString().toUpperCase();
 	}
 }

@@ -2,9 +2,11 @@ package marking.written.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,7 +14,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -172,10 +177,30 @@ public class MarksController implements TextOutput{
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy Writing");
 		alert.setHeaderText("Please wait...");
+
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
-				alert.show();
 				System.out.println("Started");
+
 				ExcelFileHandler.writeStudentMarksToFile(list);
 
 				System.out.println("DONE!!");
@@ -188,28 +213,38 @@ public class MarksController implements TextOutput{
 				updateMessage("Done!");
 				System.out.println("Done!");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
+
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					alert.close();
+
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
 		try {
 			excelView.updateView();
@@ -407,7 +442,19 @@ public class MarksController implements TextOutput{
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy Reading");
 		alert.setHeaderText("Please wait...");
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
 
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
 		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 		stage.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
 
@@ -415,10 +462,12 @@ public class MarksController implements TextOutput{
 		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
 		//alert.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
 
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
+
 				System.out.println("Started");
 				ExcelFileHandler.setFilePath_to_excel(filePath);
 
@@ -434,7 +483,26 @@ public class MarksController implements TextOutput{
 				updateMessage("Done!");
 				System.out.println("Done!");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					alert.close();
+
+					//						fillbox.setData(list.getObservableList());
+					autoTex.getEntries().addAll(list.getObservableList());
+					autoTex.setCaseSensitive(false);
+
+					if(excelView == null){
+						excelView = new ExcelView(filePath, 0, false);
+						excelView.showInNewWindow();
+					}
+					else{
+						try {
+							excelView.updateView();
+						} catch (Exception e) {
+							displayText("An error occured while updating the Spreadsheet", false);
+							e.printStackTrace();
+						}
+					}
+				});
 			}
 
 			@Override protected void cancelled() {
@@ -443,7 +511,9 @@ public class MarksController implements TextOutput{
 				System.out.println("Cancelled");
 				infoText.appendText("\nAn error ocurred ");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
@@ -452,28 +522,15 @@ public class MarksController implements TextOutput{
 				System.out.println("Failed");
 				infoText.appendText("\nAn error ocurred ");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
-
-		//						fillbox.setData(list.getObservableList());
-		autoTex.getEntries().addAll(list.getObservableList());
-		autoTex.setCaseSensitive(false);
-
-		if(excelView == null){
-			excelView = new ExcelView(filePath, 0, false);
-			excelView.showInNewWindow();
-		}
-		else{
-			try {
-				excelView.updateView();
-			} catch (Exception e) {
-				displayText("An error occured while updating the Spreadsheet", false);
-				e.printStackTrace();
-			}
-		}
 	}
 
 	private void displayExcelView(){

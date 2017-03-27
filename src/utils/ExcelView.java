@@ -2,6 +2,7 @@ package utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.MalformedURLException;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -14,6 +15,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.controlsfx.control.spreadsheet.SpreadsheetView;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -21,7 +23,10 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -90,19 +95,31 @@ public class ExcelView {
 		alert.setTitle("Busy Reading");
 		alert.setHeaderText("Please wait...");
 
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
 		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
 		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
 
 		alert.setX(Main.primaryStage.getX());
 		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-
+		alert.show();
 
 		try {
 
 			Task<Integer> task = new Task<Integer>() {
 				@Override protected Integer call() throws Exception {
 					try {
-						alert.show();
+
 						initializeView();
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -120,28 +137,30 @@ public class ExcelView {
 					System.out.println("Done!");
 
 					try{
+						Platform.runLater(() -> {
+							Parent root;
+							root = theView;
+							stage = new Stage();
+							Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
-						Parent root;
-						root = theView;
-						stage = new Stage();
-						Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+							// stage positioning
+							stage.setX(primaryScreenBounds.getMinX());
+							stage.setY(primaryScreenBounds.getMinY());
+							stage.setWidth(primaryScreenBounds.getWidth()/2);
+							stage.setHeight(primaryScreenBounds.getHeight());
 
-						// stage positioning
-						stage.setX(primaryScreenBounds.getMinX());
-						stage.setY(primaryScreenBounds.getMinY());
-						stage.setWidth(primaryScreenBounds.getWidth()/2);
-						stage.setHeight(primaryScreenBounds.getHeight());
+							stage.setTitle(new File(filePath).getName());
+							stage.setScene(new Scene(root));
 
-						stage.setTitle(new File(filePath).getName());
-						stage.setScene(new Scene(root));
+							stage.getIcons().addAll(ResourceLoader.getIcons("Excel.ico"));		
 
-						stage.getIcons().addAll(ResourceLoader.getIcons("Excel.ico"));		
+							stage.initModality(Modality.NONE);
+							stage.show();
 
-						stage.initModality(Modality.NONE);
-						stage.show();
+							SoundPlayer.stopPlayingSound();
 
-						SoundPlayer.stopPlayingSound();
-						alert.close();
+							alert.close();
+						});
 
 					}catch (Exception e) {
 						e.printStackTrace();
@@ -153,7 +172,9 @@ public class ExcelView {
 					updateMessage("Cancelled!");
 					System.out.println("Cancelled");
 					SoundPlayer.stopPlayingSound();
-					alert.close();
+					Platform.runLater(() -> {
+						alert.close();
+					});
 				}
 
 				@Override protected void failed() {
@@ -161,11 +182,15 @@ public class ExcelView {
 					updateMessage("Failed!");
 					System.out.println("Failed");
 					SoundPlayer.stopPlayingSound();
-					alert.close();
+					Platform.runLater(() -> {
+						alert.close();
+					});
 
 				}
 			};
-			task.run();
+			Thread th = new Thread(task);
+			th.setDaemon(false);
+			th.start();
 
 		}
 		catch (Exception e) {
@@ -344,13 +369,13 @@ public class ExcelView {
 	 * @param string
 	 */
 	public void setCellValue(int rowNumber, int excelColumnIndex, String string) {
-		
+
 		if(theView.getGrid().getColumnCount() <= excelColumnIndex){ // Must expand the view
 			System.err.println("TODO!! ExcelView setCellValue");
 		}
-		
+
 		getGrid().setCellValue(rowNumber,excelColumnIndex,string);
-		
+
 	}
 
 

@@ -1,14 +1,19 @@
 package marking.javaCode.gui;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -16,6 +21,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import main.Main;
 import marking.SoundPlayer;
 import marking.javaCode.MarkingHelper;
@@ -77,12 +83,27 @@ public class JavaGuiController {
 			SoundPlayer.startLoopSound();
 
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Busy wityh tasks");
+		alert.setTitle("Busy with tasks");
 		alert.setHeaderText("Please wait...");
 
-		//Image image1 = new Image(ResourceLoader.getFileInputStream("477.GIF"));
-		//ImageView imageView = new ImageView(image1);
-		//alert.setGraphic(imageView);
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
 
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
@@ -92,7 +113,6 @@ public class JavaGuiController {
 					//		SoundPlayer.startLoopSound(ResourceLoader.getMusicFile("loading.mp3"));
 					//	SoundPlayer.startLoopSound();
 				}
-				alert.show();
 				System.out.println("Started");
 				markingHelper.unZip();
 				String append = appendText.getText();
@@ -107,30 +127,39 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\n Finished ");
+
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\n Finished ");
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
+
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 	}
 
 
@@ -144,14 +173,28 @@ public class JavaGuiController {
 		alert.setTitle("Busy unZipping");
 		alert.setHeaderText("Please wait...");
 
-		//Image image1 = new Image(ResourceLoader.getFileInputStream("477.GIF"));
-		//ImageView imageView = new ImageView(image1);
-		//alert.setGraphic(imageView);
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
 
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");
 				markingHelper.unZip();
 
@@ -163,30 +206,40 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\nUnzipped ");
+
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nUnzipped ");
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
+
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
 				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 	}
 
 	@FXML
@@ -198,10 +251,29 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy appending files");
 		alert.setHeaderText("Please wait...");
+
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");
 				String append = appendText.getText();
 				markingHelper.append(append);
@@ -212,30 +284,38 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\nAppended ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAppended ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
 
 	}
@@ -248,10 +328,27 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy Opening");
 		alert.setHeaderText("Please wait...");
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");
 				markingHelper.justOpen();
 
@@ -262,30 +359,38 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\nOpened ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nOpened ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 	}
 
 	@FXML
@@ -297,9 +402,24 @@ public class JavaGuiController {
 		alert.setTitle("Busy wityh tasks");
 		alert.setHeaderText("Please wait...");
 
-		//Image image1 = new Image(ResourceLoader.getFileInputStream("477.GIF"));
-		//ImageView imageView = new ImageView(image1);
-		//alert.setGraphic(imageView);
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
 
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
@@ -309,7 +429,6 @@ public class JavaGuiController {
 					//		SoundPlayer.startLoopSound(ResourceLoader.getMusicFile("loading.mp3"));
 					//	SoundPlayer.startLoopSound();
 				}
-				alert.show();
 				System.out.println("Started");
 				markingHelper.unZip();
 				String append = appendText.getText();
@@ -322,30 +441,39 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\n Finished ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\n Finished ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
+
 	}
 
 	@FXML
@@ -356,11 +484,29 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy checking");
 		alert.setHeaderText("Please wait...");
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			String res;
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");
 				String check = checkString.getText();
 				res =markingHelper.checkForString(check);
@@ -371,52 +517,61 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\n Check for String result: \n"+res);
+				Platform.runLater(() -> {
+					infoText.appendText("\n Check for String result: \n"+res);
 
-				if(!res.equals("FOUND "+checkString.getText()+ " in ALL FILES")){
-					String str = res;
-					String findStr = checkString.getText();
-					int lastIndex = 0;
-					int count = 0;
+					if(!res.equals("FOUND "+checkString.getText()+ " in ALL FILES")){
+						String str = res;
+						String findStr = checkString.getText();
+						int lastIndex = 0;
+						int count = 0;
 
-					while(lastIndex != -1){
+						while(lastIndex != -1){
 
-						lastIndex = str.indexOf(findStr,lastIndex);
+							lastIndex = str.indexOf(findStr,lastIndex);
 
-						if(lastIndex != -1){
-							count ++;
-							lastIndex += findStr.length();
+							if(lastIndex != -1){
+								count ++;
+								lastIndex += findStr.length();
+							}
 						}
+
+						infoText.appendText("\nNot found in "+count+" files!!");
+
 					}
 
-					infoText.appendText("\nNot found in "+count+" files!!");
-
-				}
-
-				SoundPlayer.stopPlayingSound();
-				infoText.appendText("\nDone checking ");
-				alert.close();
+					SoundPlayer.stopPlayingSound();
+					infoText.appendText("\nDone checking ");
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
+
 
 	}
 
@@ -429,13 +584,32 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy reading");
 		alert.setHeaderText("Please wait...");
+
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			String res;
 			@Override protected Integer call() throws Exception {
 
 				try {
 
-					alert.show();
 					System.out.println("Started");
 					res =markingHelper.readMarks();
 
@@ -459,31 +633,39 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				infoText.appendText("\n "+res);
-				infoText.appendText("\nDone reading the marks ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\n "+res);
+					infoText.appendText("\nDone reading the marks ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
 
 	}
@@ -497,10 +679,28 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Zipping Up");
 		alert.setHeaderText("Please wait...");
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");			
 				markingHelper.zipFolder(suffix.getText());
 				return new Integer(2);
@@ -510,32 +710,39 @@ public class JavaGuiController {
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
+				Platform.runLater(() -> {
 
-
-				infoText.appendText("\nDone zipping ");
-				alert.close();
-				SoundPlayer.stopPlayingSound();
+					infoText.appendText("\nDone zipping ");
+					alert.close();
+					SoundPlayer.stopPlayingSound();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
 	}
 
@@ -543,7 +750,7 @@ public class JavaGuiController {
 	void initialize() {
 
 		// Menu
-				Main.createMenu(menu);
+		Main.createMenu(menu);
 		//File Dragging functionality...  START
 
 

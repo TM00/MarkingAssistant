@@ -44,7 +44,6 @@ public class ConfigureController {
 	@FXML
 	void saveClicked(ActionEvent event) {
 
-
 		// Excel
 		Main.settings.initialsColumnLetter = this.initials.getText();
 		Main.settings.surnameColumnLetter = this.surname.getText();

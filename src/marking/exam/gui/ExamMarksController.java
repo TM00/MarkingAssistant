@@ -2,11 +2,13 @@ package marking.exam.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -19,7 +21,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -186,7 +191,7 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 				}
 				counter++;
 			}
-			
+
 			// find total
 			for(ConfigListData d: Main.configData.questionData){
 				if(d.getName().equals("TOTAL")){
@@ -194,7 +199,7 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 					break;
 				}
 			}
-			
+
 			if(Main.configData.writeTotal && total !=null){
 				excelView.setCellValue(student.getRowNumber(), ExcelUtils.getExcelColumnIndex(total.getExcelColumn()),
 						student.getTotalMark()+"");
@@ -224,9 +229,27 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy Writing");
 		alert.setHeaderText("Please wait...");
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+
+		alert.setX(Main.primaryStage.getX());
+		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
+		alert.show();
+
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
-				alert.show();
 				System.out.println("Started");
 				ExamExcelHandler.writeExamStudentMarksToFile(list, Main.configData.writeQuestions, Main.configData.writeTotal);
 
@@ -240,29 +263,37 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 
 
 	}
@@ -586,17 +617,28 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 		alert.setTitle("Busy Reading");
 		alert.setHeaderText("Please wait...");
 
-		Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
+		File f = ResourceLoader.getFile("Banana.gif");
+		Image image;
+		try {
+			image = new Image(f.toURI().toURL().toString());
+			ImageView view = new ImageView(image);
+
+			alert.setGraphic(view);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
+		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
+		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
 
 		alert.setX(Main.primaryStage.getX());
 		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-		//alert.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));
+		alert.show();
 
 		Task<Integer> task = new Task<Integer>() {
 			@Override protected Integer call() throws Exception {
 
-				alert.show();
 				System.out.println("Started");
 				ExamExcelHandler.setFilePath_to_excel(filePath);
 				System.out.println("1...");
@@ -605,6 +647,24 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 
 				list=ExamExcelHandler.readExamStudentListFromFile();
 				System.out.println("3...");
+
+				//						fillbox.setData(list.getObservableList());
+				autoTex.getEntries().addAll(list.getObservableList());
+				autoTex.setCaseSensitive(false);
+
+				if(excelView == null){
+					excelView = new ExcelView(filePath, 0, false);
+					excelView.showInNewWindow();
+				}
+				else{
+					try {
+						excelView.updateView();
+					} catch (Exception e) {
+						displayText("An error occured while updating the Spreadsheet", false);
+						e.printStackTrace();
+					}
+				}
+
 				return new Integer(2);
 			}
 
@@ -612,46 +672,37 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 				super.succeeded();
 				updateMessage("Done!");
 				System.out.println("Done!");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void cancelled() {
 				super.cancelled();
 				updateMessage("Cancelled!");
 				System.out.println("Cancelled");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 
 			@Override protected void failed() {
 				super.failed();
 				updateMessage("Failed!");
 				System.out.println("Failed");
-				infoText.appendText("\nAn error ocurred ");
-				SoundPlayer.stopPlayingSound();
-				alert.close();
+				Platform.runLater(() -> {
+					infoText.appendText("\nAn error ocurred ");
+					SoundPlayer.stopPlayingSound();
+					alert.close();
+				});
 			}
 		};
-		task.run();
-
-		//						fillbox.setData(list.getObservableList());
-		autoTex.getEntries().addAll(list.getObservableList());
-		autoTex.setCaseSensitive(false);
-
-		if(excelView == null){
-			excelView = new ExcelView(filePath, 0, false);
-			excelView.showInNewWindow();
-		}
-		else{
-			try {
-				excelView.updateView();
-			} catch (Exception e) {
-				displayText("An error occured while updating the Spreadsheet", false);
-				e.printStackTrace();
-			}
-		}
+		Thread th = new Thread(task);
+		th.setDaemon(false);
+		th.start();
 	}
 
 	private void displayExcelView(){
