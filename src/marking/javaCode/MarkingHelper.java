@@ -1,5 +1,7 @@
 package marking.javaCode;
 
+import java.io.File;
+
 import res.ResourceLoader;
 
 public class MarkingHelper {
@@ -9,21 +11,63 @@ public class MarkingHelper {
 
 	public MarkingHelper(String zipfolder) {
 		setDefaults();
-		this.zipfolder = zipfolder;
-		destFolder = zipfolder.substring(0,zipfolder.lastIndexOf("."));
+
+		File f = new File(zipfolder);
+		if(FileDeleter.getFileExtension(f).equals("zip") 
+				|| FileDeleter.getFileExtension(f).equals("rar") 
+				|| FileDeleter.getFileExtension(f).equals("7z")){
+			// File is a zip file
+			this.zipfolder = zipfolder;
+			destFolder = zipfolder.substring(0,zipfolder.lastIndexOf("."));
+		}else{ // not zip
+			if(f.isDirectory()){
+				// file is a folder
+				destFolder =  zipfolder;
+
+			}
+			else{
+				throw new UnsupportedOperationException("File not zip or folder??");
+			}
+
+		}
 	}
 
 	public MarkingHelper(String zipfolder, String append) {
 		setDefaults();
-		this.zipfolder = zipfolder;
 		this.append = append;
-		destFolder = zipfolder.substring(0,zipfolder.lastIndexOf("."));
+
+		File f = new File(zipfolder);
+		if(FileDeleter.getFileExtension(f).equals("zip") 
+				|| FileDeleter.getFileExtension(f).equals("rar") 
+				|| FileDeleter.getFileExtension(f).equals("7z")){
+			// File is a zip file
+			this.zipfolder = zipfolder;
+			destFolder = zipfolder.substring(0,zipfolder.lastIndexOf("."));
+		}else{ // not zip
+			if(f.isDirectory()){
+				// file is a folder
+				destFolder =  zipfolder;
+
+			}
+			else{
+				throw new UnsupportedOperationException("File not zip or folder??");
+			}
+
+		}
 	}
 
 	private void setDefaults(){
 		append = "// Theo";
 		//notePadpp = "C:\\Program Files (x86)\\Notepad++\\notepad++.exe";
 		notePadpp =ResourceLoader.getNotePadPPpath();
+	}
+
+	/**
+	 * Deletes all the files in the folder which doesn't have the given extension
+	 * @param extention
+	 */
+	public void deleteFilesNotExtension(String extension){
+		FileDeleter.deleteFileNOTWithExtensionFromFolderWitSubFolders(extension, destFolder);
 	}
 
 	/**
@@ -37,52 +81,6 @@ public class MarkingHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
-	}
-
-	/**
-	 * Unzips the files, appends them and opens the files with notepaddpp
-	 */
-	public void unZipAppendAndOpen(){
-
-		// Unzip file
-		try {
-			ZipFileUtils.unzip(zipfolder, destFolder);
-
-			FileOpener.appendFiles(append, destFolder);
-
-			FileOpener.openFilesWithNotepadPP(destFolder, notePadpp);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void unZipAppend() {
-		// Unzip file
-		try {
-			ZipFileUtils.unzip(zipfolder, destFolder);
-
-			FileOpener.appendFiles(append, destFolder);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
-	}
-
-	/**
-	 * Unzips the files and opens the files with notepaddpp
-	 */
-	public void unZipAndOpen(){
-
-		// Unzip file
-		try {
-			ZipFileUtils.unzip(zipfolder, destFolder);
-			FileOpener.openFilesWithNotepadPP(destFolder, notePadpp);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
@@ -135,11 +133,13 @@ public class MarkingHelper {
 	 * Searches through all the files for a certain string, for example a mark allocation
 	 * @return - if the string was found in all the files
 	 */
-	public String checkForString(String search){
+	public String checkForString(String search, boolean openNotFound){
+
+		FileOpener.notePadppPath = notePadpp;
 
 		String s = "FOUND "+search+ " in ALL FILES";
 
-		String p = FileOpener.checkFiles(search, destFolder);
+		String p = FileOpener.checkFiles(search, destFolder,openNotFound);
 
 		if(p.equals(""))
 			return s;
@@ -167,6 +167,10 @@ public class MarkingHelper {
 
 
 		System.out.println(readMarks());
+	}
+
+	public boolean isZipFolderNull(){
+		return zipfolder == null;
 	}
 
 	public static void main(String[] args) {

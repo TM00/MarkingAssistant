@@ -10,13 +10,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -60,6 +61,24 @@ public class JavaGuiController {
 	private TextField suffix;
 
 	@FXML
+	private CheckBox appendBox;
+
+	@FXML
+	private CheckBox unzipBox;
+
+	@FXML
+	private CheckBox deleteBox;
+
+	@FXML
+	private TextField extensionText;
+
+	@FXML
+	private CheckBox openBox;
+
+	@FXML
+	private CheckBox openNotFoundFilesBox;
+
+	@FXML
 	void chooseFilePressed(ActionEvent event) {
 
 		File f = ExcelFileHandler.getFile("zip");
@@ -73,7 +92,7 @@ public class JavaGuiController {
 	}
 
 	@FXML
-	void unzipAppendOpen(ActionEvent event) {
+	void perFromActions(ActionEvent event) {
 		/*	SoundPlayer.startLoopSound();
 		this.unZip(null);
 		this.append(null);
@@ -86,7 +105,7 @@ public class JavaGuiController {
 		alert.setTitle("Busy with tasks");
 		alert.setHeaderText("Please wait...");
 
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());
@@ -113,12 +132,61 @@ public class JavaGuiController {
 					//		SoundPlayer.startLoopSound(ResourceLoader.getMusicFile("loading.mp3"));
 					//	SoundPlayer.startLoopSound();
 				}
-				System.out.println("Started");
-				markingHelper.unZip();
-				String append = appendText.getText();
-				markingHelper.append(append);
-				markingHelper.justOpen();
+				//	System.out.println("Started");
 
+				if(markingHelper.isZipFolderNull()){
+					unzipBox.setSelected(false);
+				}
+
+				if(unzipBox.isSelected()){
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							alert.setTitle("Unzipping...");
+
+						}
+					});
+					markingHelper.unZip();
+				}
+
+				if(deleteBox.isSelected()){
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							alert.setTitle("Deleting...");
+
+						}
+					});
+					String extension = extensionText.getText();
+					markingHelper.deleteFilesNotExtension(extension);
+				}
+
+				if(appendBox.isSelected()){
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							alert.setTitle("Appending...");
+
+						}
+					});
+					String append = appendText.getText();
+					markingHelper.append(append);
+				}
+
+				if(openBox.isSelected()){
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							alert.setTitle("Opening...");
+
+						}
+					});
+					markingHelper.justOpen();
+				}
 
 				return new Integer(2);
 			}
@@ -160,320 +228,6 @@ public class JavaGuiController {
 		Thread th = new Thread(task);
 		th.setDaemon(false);
 		th.start();
-	}
-
-
-	@FXML
-	void unZip(ActionEvent event) {
-
-		if(Main.settings.playLoadingSound)
-			SoundPlayer.startLoopSound();
-
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Busy unZipping");
-		alert.setHeaderText("Please wait...");
-
-		File f = ResourceLoader.getFile("Banana.gif");
-		Image image;
-		try {
-			image = new Image(f.toURI().toURL().toString());
-			ImageView view = new ImageView(image);
-
-			alert.setGraphic(view);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
-		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
-
-		alert.setX(Main.primaryStage.getX());
-		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-		alert.show();
-
-		Task<Integer> task = new Task<Integer>() {
-			@Override protected Integer call() throws Exception {
-
-				System.out.println("Started");
-				markingHelper.unZip();
-
-
-				return new Integer(2);
-			}
-
-			@Override protected void succeeded() {
-				super.succeeded();
-				updateMessage("Done!");
-				System.out.println("Done!");
-
-				SoundPlayer.stopPlayingSound();
-				Platform.runLater(() -> {
-					infoText.appendText("\nUnzipped ");
-					alert.close();
-				});
-			}
-
-			@Override protected void cancelled() {
-				super.cancelled();
-				updateMessage("Cancelled!");
-				System.out.println("Cancelled");
-
-				SoundPlayer.stopPlayingSound();
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					alert.close();
-				});
-			}
-
-			@Override protected void failed() {
-				super.failed();
-				updateMessage("Failed!");
-				System.out.println("Failed");
-				SoundPlayer.stopPlayingSound();
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					alert.close();
-				});
-			}
-		};
-		Thread th = new Thread(task);
-		th.setDaemon(false);
-		th.start();
-	}
-
-	@FXML
-	void append(ActionEvent event) {
-
-		if(Main.settings.playLoadingSound)
-			SoundPlayer.startLoopSound();
-
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Busy appending files");
-		alert.setHeaderText("Please wait...");
-
-		File f = ResourceLoader.getFile("Banana.gif");
-		Image image;
-		try {
-			image = new Image(f.toURI().toURL().toString());
-			ImageView view = new ImageView(image);
-
-			alert.setGraphic(view);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
-		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
-
-		alert.setX(Main.primaryStage.getX());
-		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-		alert.show();
-
-		Task<Integer> task = new Task<Integer>() {
-			@Override protected Integer call() throws Exception {
-
-				System.out.println("Started");
-				String append = appendText.getText();
-				markingHelper.append(append);
-				return new Integer(2);
-			}
-
-			@Override protected void succeeded() {
-				super.succeeded();
-				updateMessage("Done!");
-				System.out.println("Done!");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAppended ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void cancelled() {
-				super.cancelled();
-				updateMessage("Cancelled!");
-				System.out.println("Cancelled");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void failed() {
-				super.failed();
-				updateMessage("Failed!");
-				System.out.println("Failed");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-		};
-		Thread th = new Thread(task);
-		th.setDaemon(false);
-		th.start();
-
-
-	}
-
-	@FXML
-	void open(ActionEvent event) {
-		if(Main.settings.playLoadingSound)
-			SoundPlayer.startLoopSound();
-
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Busy Opening");
-		alert.setHeaderText("Please wait...");
-		File f = ResourceLoader.getFile("Banana.gif");
-		Image image;
-		try {
-			image = new Image(f.toURI().toURL().toString());
-			ImageView view = new ImageView(image);
-
-			alert.setGraphic(view);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
-		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
-
-		alert.setX(Main.primaryStage.getX());
-		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-		alert.show();
-
-		Task<Integer> task = new Task<Integer>() {
-			@Override protected Integer call() throws Exception {
-
-				System.out.println("Started");
-				markingHelper.justOpen();
-
-				return new Integer(2);
-			}
-
-			@Override protected void succeeded() {
-				super.succeeded();
-				updateMessage("Done!");
-				System.out.println("Done!");
-				Platform.runLater(() -> {
-					infoText.appendText("\nOpened ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void cancelled() {
-				super.cancelled();
-				updateMessage("Cancelled!");
-				System.out.println("Cancelled");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void failed() {
-				super.failed();
-				updateMessage("Failed!");
-				System.out.println("Failed");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-		};
-		Thread th = new Thread(task);
-		th.setDaemon(false);
-		th.start();
-	}
-
-	@FXML
-	void unzipAppend(ActionEvent event) {
-		if(Main.settings.playLoadingSound)
-			SoundPlayer.startLoopSound();
-
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Busy wityh tasks");
-		alert.setHeaderText("Please wait...");
-
-		File f = ResourceLoader.getFile("Banana.gif");
-		Image image;
-		try {
-			image = new Image(f.toURI().toURL().toString());
-			ImageView view = new ImageView(image);
-
-			alert.setGraphic(view);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true); // Disable the button
-		Stage stage1 = (Stage) alert.getDialogPane().getScene().getWindow();
-		stage1.getIcons().addAll(ResourceLoader.getIcons("check_mark.ico"));	
-
-		alert.setX(Main.primaryStage.getX());
-		alert.setY(Main.primaryStage.getY()+Main.primaryStage.getWidth()/2);
-		alert.show();
-
-		Task<Integer> task = new Task<Integer>() {
-			@Override protected Integer call() throws Exception {
-
-				if(Main.settings.playLoadingSound){
-					System.err.println("Starting play....... unZip");
-					//		SoundPlayer.startLoopSound(ResourceLoader.getMusicFile("loading.mp3"));
-					//	SoundPlayer.startLoopSound();
-				}
-				System.out.println("Started");
-				markingHelper.unZip();
-				String append = appendText.getText();
-				markingHelper.append(append);
-
-				return new Integer(2);
-			}
-
-			@Override protected void succeeded() {
-				super.succeeded();
-				updateMessage("Done!");
-				System.out.println("Done!");
-				Platform.runLater(() -> {
-					infoText.appendText("\n Finished ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void cancelled() {
-				super.cancelled();
-				updateMessage("Cancelled!");
-				System.out.println("Cancelled");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-
-			@Override protected void failed() {
-				super.failed();
-				updateMessage("Failed!");
-				System.out.println("Failed");
-				Platform.runLater(() -> {
-					infoText.appendText("\nAn error ocurred ");
-					SoundPlayer.stopPlayingSound();
-					alert.close();
-				});
-			}
-		};
-		Thread th = new Thread(task);
-		th.setDaemon(false);
-		th.start();
-
 	}
 
 	@FXML
@@ -484,7 +238,7 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy checking");
 		alert.setHeaderText("Please wait...");
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());
@@ -509,7 +263,7 @@ public class JavaGuiController {
 
 				System.out.println("Started");
 				String check = checkString.getText();
-				res =markingHelper.checkForString(check);
+				res =markingHelper.checkForString(check,openNotFoundFilesBox.isSelected());
 				return new Integer(2);
 			}
 
@@ -585,7 +339,7 @@ public class JavaGuiController {
 		alert.setTitle("Busy reading");
 		alert.setHeaderText("Please wait...");
 
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());
@@ -679,7 +433,7 @@ public class JavaGuiController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Zipping Up");
 		alert.setHeaderText("Please wait...");
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());
@@ -749,6 +503,20 @@ public class JavaGuiController {
 	@FXML
 	void initialize() {
 
+		assert infoText != null : "fx:id=\"infoText\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert appendBox != null : "fx:id=\"appendBox\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert unzipBox != null : "fx:id=\"unzipBox\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert extensionText != null : "fx:id=\"extensionText\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert openBox != null : "fx:id=\"openBox\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert checkString != null : "fx:id=\"checkString\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert chooseFileButton != null : "fx:id=\"chooseFileButton\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert mainPane != null : "fx:id=\"mainPane\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert appendText != null : "fx:id=\"appendText\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert suffix != null : "fx:id=\"suffix\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert menu != null : "fx:id=\"menu\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert deleteBox != null : "fx:id=\"deleteBox\" was not injected: check your FXML file 'JavaGui.fxml'.";
+		assert openNotFoundFilesBox != null : "fx:id=\"openNotFoundFilesBox\" was not injected: check your FXML file 'JavaGui.fxml'.";
+
 		// Menu
 		Main.createMenu(menu);
 		//File Dragging functionality...  START
@@ -803,6 +571,10 @@ public class JavaGuiController {
 						String filePath= file.getAbsolutePath();
 						System.out.println(filePath);
 						markingHelper = new MarkingHelper(filePath);
+
+						if(markingHelper.isZipFolderNull()){
+							unzipBox.setSelected(false);
+						}
 
 						infoText.appendText("\nDropped file "+filePath);
 					}

@@ -229,7 +229,7 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Busy Writing");
 		alert.setHeaderText("Please wait...");
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());
@@ -617,7 +617,7 @@ public class ExamMarksController implements TextOutput, CustomTextEventHandler{
 		alert.setTitle("Busy Reading");
 		alert.setHeaderText("Please wait...");
 
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());

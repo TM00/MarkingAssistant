@@ -23,14 +23,6 @@ public class NewSettingsController {
 	@FXML
 	private AnchorPane mainPane;
 
-	@FXML
-	private TextField checkStringDefault;
-
-	@FXML
-	private TextField zipSuffixDefault;
-
-	@FXML
-	private TextField appendStringDefault;
 
 	@FXML
 	private MenuBar menu;
@@ -43,13 +35,6 @@ public class NewSettingsController {
 
 	@FXML
 	void saveClicked(ActionEvent event) {
-
-
-		// Java
-
-		Main.settings.appendString = appendStringDefault.getText();
-		Main.settings.CheckString = checkStringDefault.getText();
-		Main.settings.zipSuffixString = zipSuffixDefault.getText();
 
 		// Sound
 
@@ -66,19 +51,11 @@ public class NewSettingsController {
 		assert playBackground != null : "fx:id=\"playBackground\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
 		assert playLoading != null : "fx:id=\"playLoading\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
 		assert mainPane != null : "fx:id=\"mainPane\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
-		assert checkStringDefault != null : "fx:id=\"checkStringDefault\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
-		assert zipSuffixDefault != null : "fx:id=\"zipSuffixDefault\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
-		assert appendStringDefault != null : "fx:id=\"appendStringDefault\" was not injected: check your FXML file 'NewSettingsGui.fxml'.";
 
 		// Menu
 		Main.createMenu(menu);
 
 
-		// Java
-
-		this.appendStringDefault.setText(Main.settings.appendString);
-		this.checkStringDefault.setText(Main.settings.CheckString);
-		this.zipSuffixDefault.setText(Main.settings.zipSuffixString);
 
 		// Sound
 

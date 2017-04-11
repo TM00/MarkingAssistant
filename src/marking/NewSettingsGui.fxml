@@ -9,18 +9,6 @@
 
 <AnchorPane fx:id="mainPane" prefHeight="574.0" prefWidth="385.0" styleClass="background" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="marking.NewSettingsController">
    <children>
-      <Line endX="100.0" layoutX="180.0" layoutY="201.0" startX="-100.0" />
-      <Label layoutX="163.0" layoutY="209.0" prefHeight="36.0" prefWidth="60.0" text="Java" textAlignment="CENTER">
-         <font>
-            <Font name="Arial" size="20.0" />
-         </font>
-      </Label>
-      <Label layoutX="51.0" layoutY="245.0" text="Append String" />
-      <TextField fx:id="appendStringDefault" layoutX="179.0" layoutY="241.0" />
-      <TextField fx:id="checkStringDefault" layoutX="182.0" layoutY="273.0" />
-      <Label layoutX="54.0" layoutY="277.0" text="Check String" textFill="#20ab45" />
-      <Label layoutX="54.0" layoutY="310.0" text="zip suffix" />
-      <TextField fx:id="zipSuffixDefault" layoutX="182.0" layoutY="306.0" />
       <Label layoutX="155.0" layoutY="359.0" prefHeight="36.0" prefWidth="60.0" text="Sound" textAlignment="CENTER">
          <font>
             <Font name="Arial" size="20.0" />

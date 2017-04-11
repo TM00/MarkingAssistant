@@ -95,7 +95,7 @@ public class ExcelView {
 		alert.setTitle("Busy Reading");
 		alert.setHeaderText("Please wait...");
 
-		File f = ResourceLoader.getFile("Banana.gif");
+		File f = ResourceLoader.getRandomGif();
 		Image image;
 		try {
 			image = new Image(f.toURI().toURL().toString());

@@ -6,11 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.TimeUnit;
 
 public class FileOpener {
+
+	public static String notePadppPath;
 
 	/**
 	 * Loops through all the files in a folder and appends them with the given text
@@ -105,7 +106,7 @@ public class FileOpener {
 	 * Loops through all the files in a folder and checks if they contain a string
 	 * @param folderPath
 	 */
-	public static String checkFiles(String text, String filePath){
+	public static String checkFiles(String text, String filePath, boolean openNotFound){
 
 		File f = new File(filePath);
 		String total = "";
@@ -116,7 +117,7 @@ public class FileOpener {
 			File[] list = f.listFiles();
 			for (int i = 0; i < list.length; i++) {
 				subf = list[i];
-				String res = checkFiles(text,subf.getPath());
+				String res = checkFiles(text,subf.getPath(),openNotFound);
 				if(res.equals("")){
 
 				}
@@ -132,11 +133,11 @@ public class FileOpener {
 
 		}
 		else{
-			String s = checkFileForString(text, filePath);
-			
+			String s = checkFileForString(text, filePath,openNotFound);
+
 			if(!s.equals(""))
 				total += "\n"+s;
-			
+
 			return total;
 		}
 
@@ -348,7 +349,7 @@ public class FileOpener {
 	 * @param append - Text to be added
 	 * @param filePath - path to the file
 	 */
-	public static String checkFileForString(String text, String filePath){
+	public static String checkFileForString(String text, String filePath, boolean openNotFound){
 		System.out.println("checkFileForString: "+filePath);
 		BufferedReader reader;
 
@@ -374,6 +375,13 @@ public class FileOpener {
 		}
 		System.err.println("String not found,  returning false!!");
 		System.err.println("File: "+ filePath);
+		// open file
+		if (openNotFound) {
+			if(notePadppPath !=null)
+				openFileWithNotepadPP(filePath,notePadppPath);
+		}
+
+
 		return "String: "+text+" NOT FOUND in "+filePath;
 
 	}
@@ -392,7 +400,7 @@ public class FileOpener {
 		if(folder.exists()){
 			if(folder.isDirectory()){
 				for(File f:folder.listFiles()){
-					if(checkFileForString(text, f.getPath()).equals("")){ // Found string
+					if(checkFileForString(text, f.getPath(), false).equals("")){ // Found string
 
 					}
 
@@ -442,6 +450,11 @@ public class FileOpener {
 		else{
 			System.err.println("Folder doesn't exist.. path: "+filePath);
 		}
+	}
+
+	public static String checkFilesAndOpen(String search, String destFolder) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

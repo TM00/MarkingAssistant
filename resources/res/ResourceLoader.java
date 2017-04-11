@@ -1,6 +1,5 @@
 package res;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -22,6 +22,7 @@ public class ResourceLoader {
 	private static ResourceLoader rl = new ResourceLoader();
 	private static final String MUSICFOLDERNAME = "sounds";
 	private static final String LOADINGFOLDERNAME = "loadingSound";
+	private static final String GIFFOLDERNAME = "gifs";
 
 	/*public static Image getImage(String s){
 
@@ -101,6 +102,22 @@ public class ResourceLoader {
 		System.out.println(userDirectory); 
 
 		return new File(userDirectory+"\\resources\\"+s);
+	}
+
+	public static File getRandomGif(){
+		String userDirectory = System.getProperty("user.dir");
+
+		String path = userDirectory+"\\"+GIFFOLDERNAME;
+		System.out.println(path); 
+		File folder = new File(path);
+
+		File[] gifs = folder.listFiles();
+
+		int randomNum = ThreadLocalRandom.current().nextInt(0, gifs.length-1 + 1);
+
+		return gifs[randomNum];
+
+
 	}
 
 	public static File getMusicFolder(){
