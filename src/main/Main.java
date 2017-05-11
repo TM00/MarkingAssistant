@@ -48,7 +48,8 @@ public class Main extends Application {
 			/*
 			 GENERAL COMMENTS + TODO: 
 
-		      autofill text box - Tab key to select
+		      autofill text box - Tab key OR enter to select
+		      				- Make focus when down arrow is pressed on textetfield...
 
 
 			 - Control where the focus goes after entering/adding the mark, eg to the name textfield for the next entry

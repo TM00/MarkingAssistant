@@ -1,6 +1,10 @@
 package utils;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -71,7 +75,7 @@ public class ExcelUtils {
 		if(cell == null){
 			return s;
 		}
-
+/*
 		switch (evaluator.evaluateFormulaCell(cell)) {
 		case Cell.CELL_TYPE_BOOLEAN:
 			s= ""+cell.getBooleanCellValue();
@@ -103,7 +107,79 @@ public class ExcelUtils {
 			s="";
 			break;
 		}
+*/
+		
+		switch (cell.getCellType()) {
+		case Cell.CELL_TYPE_STRING:
+		    s = cell.getStringCellValue();
+		    break;
 
+		case Cell.CELL_TYPE_FORMULA:
+		    s = getFormulaCellValue(evaluator, cell);
+		    break;
+
+		case Cell.CELL_TYPE_NUMERIC:
+		    if (DateUtil.isCellDateFormatted(cell)) {
+		        s = new SimpleDateFormat("dd-MM-yyyy").format(cell.getDateCellValue());
+		    } else {
+		    	DecimalFormat df = new DecimalFormat("#");
+		        s = df.format(cell.getNumericCellValue());
+		    }
+		    break;
+
+		case Cell.CELL_TYPE_BLANK:
+		    s = "";
+		    break;
+
+		case Cell.CELL_TYPE_BOOLEAN:
+		    s = Boolean.toString(cell.getBooleanCellValue());
+		    break;
+
+		}
+		
+		return s;
+	}
+	
+	private static String getFormulaCellValue(FormulaEvaluator evaluator, Cell cell){
+		
+		String s = "";
+
+		switch (evaluator.evaluateFormulaCell(cell)) {
+		case Cell.CELL_TYPE_BOOLEAN:
+			s= ""+cell.getBooleanCellValue();
+			break;
+		case Cell.CELL_TYPE_NUMERIC:
+			if (DateUtil.isCellDateFormatted(cell)) {
+		    	System.out.println("Date cell! F");
+		        s = new SimpleDateFormat("dd-MM-yyyy").format(cell.getDateCellValue());
+		    } else {
+		        s = new EngineeringFormat(2).format(cell.getNumericCellValue());
+		    }
+			break;
+		case Cell.CELL_TYPE_STRING:
+			s=cell.getStringCellValue();
+			break;
+		case Cell.CELL_TYPE_BLANK:
+			s="";
+			break;
+		case Cell.CELL_TYPE_ERROR:
+			s="";
+			break;
+
+			// CELL_TYPE_FORMULA will never happen
+		case Cell.CELL_TYPE_FORMULA: 
+			break;
+			
+		case -1:
+			// Cell was not a formula
+			s = cellToString(cell);
+			break;
+
+		default:
+			System.err.println("Cell type unsupported row" +(cell.getRowIndex()+1)+" col "+(cell.getColumnIndex()+1));
+			s="";
+			break;
+		}
 		return s;
 	}
 	

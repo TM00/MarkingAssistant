@@ -23,8 +23,8 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
@@ -32,7 +32,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import main.Main;
 import marking.SoundPlayer;
-import marking.written.gui.ExcelFileHandler;
 import res.ResourceLoader;
 
 /**
@@ -249,9 +248,12 @@ public class ExcelView {
 				for (int column = 0; column < grid.getColumnCount(); ++column) {
 
 					cell = poiRow.getCell(column);
+//					System.out.println("r: "+row + " col:"+column );
 					value = ExcelUtils.cellStringValue(evaluator,cell).trim();
-
-					list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,value));
+					SpreadsheetCell spc = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,value);
+					
+					
+					list.add(spc);
 				}
 			}
 			rows.add(list);
